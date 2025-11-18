@@ -14,40 +14,43 @@ body {
 }
 .screen { display: none; min-height: 100vh; width: 100vw; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
 .screen.active { display: flex; }
-.bigtext { font-size: 2.7rem; font-family: 'Pacifico', cursive; margin: 2rem 0; opacity: 0; animation: fadeIn 1.5s forwards;}
-@keyframes fadeIn { to { opacity: 1; } }
+.bigtext { font-size: 2.7rem; font-family: 'Pacifico', cursive; margin: 2rem 0; }
 .button { background: linear-gradient(120deg,#f7b801, #5177df); color: #fff; border: none; font-size: 1.4rem; border-radius: 12px; padding: 0.8rem 2.2rem; cursor: pointer; font-family: 'Montserrat',sans-serif; font-weight: bold; letter-spacing: 1px; margin: 2rem auto 0 auto; box-shadow: 0 4px 20px #5177df60; transition: background 0.25s;}
-.button:hover { background: linear-gradient(120deg,#ffe666,#5177df); }
-.black-bg { background: #111; color: #ffe666; }
-.lights-strip { width:100vw; height:54px; position:fixed; top:0; left:0; z-index:120; display:flex; justify-content:center; align-items:flex-end; pointer-events:none;}
-.bulb { width: 26px; height: 26px; margin: 0 14px; border-radius: 50%; background: #ffe666; box-shadow: 0 0px 20px #ffd700c2; animation: twinkle 1.7s infinite alternate; }
-.bulb.blue { background:#5177df; box-shadow: 0 0px 16px #5177dfa2;}
-.bulb.pink { background: #e457a7; box-shadow: 0 0px 16px #e457a7a2;}
-.bulb.green{ background:#65e469; box-shadow:0 0px 16px #54cf90a2;}
-@keyframes twinkle {0% { opacity:.8;}100% {opacity:1;}}
-.balloons-area { position: fixed; left:0; right:0; top:54px; height: 100vh; z-index:110; pointer-events: none;}
-.balloon { position: absolute; bottom: -80px; width: 44px; height: 66px; background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%); border-radius: 46% 54% 54% 46% / 80% 65% 35% 60%; box-shadow: 0 0px 30px #ffd70066; animation: balloonUp 12s linear infinite;}
-.balloon.blue { background: radial-gradient(circle at 60% 30%, #7eadf7 65%, #5177df 100%);}
-.balloon.pink { background: radial-gradient(circle at 60% 30%, #ffb6ec 70%, #e457a7 100%);}
-.balloon .string { position: absolute; top: 62px; left: 19px; width: 4px; height: 48px; background: #f2ca6e; border-radius: 32px;}
-@keyframes balloonUp { to {bottom: 110vh;} }
-/* Birthday Cake */
-.cake-area { width: 100vw; text-align: center; margin: 2rem 0 0.5rem 0;}
-.cake { display: inline-block; position: relative; width: 124px; height: 124px; margin: 0 auto 0;}
-.cake-base { position:absolute; bottom:0; left:2px; width:120px; height:60px; background:#6c3f11; border-radius:0 0 38px 38px/0 0 52px 52px; box-shadow:0 6px 16px #ffe6661d;}
-.cake-icing {position:absolute; left:2px; top:38px; width:120px; height:31px; background:#fffbe7; border-radius: 38px 38px 22px 22px/46px 66px 17px 17px; box-shadow:0 2px 8px #fffbe7;}
-.cake-candle { position:absolute; left:59px; top:20px; width:7px; height:28px; background:#5177df; border-radius:6px;}
-.cake-flame { position:absolute; left:59px; top:7px; width:13px; height:24px; background: radial-gradient(circle at 60% 30%, #FBB034 55%, #F9DF56 90%); border-radius: 50% 60% 30% 50%/58% 43% 60% 28%; box-shadow:0 0 22px 10px #ffe666; animation: candleFlicker 2.3s infinite;}
-@keyframes candleFlicker {0%,100%{width:12px;height:19px;transform:rotate(-9deg);} 30%{width:10px;height:17px;transform:rotate(9deg);} 70%{width:13px;height:22px;transform:rotate(-6deg);} }
-.cake-flame.off { display:none; }
-.cake-candle.off { background: #333; }
-.cake-icing { border-bottom: 5px solid #f7b801;}
-.cake-text { font-family: 'Pacifico',cursive; color: #ffe666; font-size: 1.2em; margin: 1em 0 0.5em 0; text-shadow: 0 0 6px #5177df99;}
-.happy-text { font-size: 2.8em; font-family: 'Pacifico',cursive; color:#ffe666; text-shadow: 0 0 28px #5177dfa0, 3px 3px 10px #222; animation: shineText 2.7s ease-in-out both; margin:1rem 0; letter-spacing: 2px;}
-@keyframes shineText {0% {opacity:0;filter: blur(10px);}60% {opacity:1;filter:blur(0px);}85% {color:#fffbe7;}100% {color:#ffe666;}}
+.button:hover { background: linear-gradient(120deg,#ffe666,#5177df);}
+input[type="password"] {font-size:1.2em;padding:0.5em 1em;border-radius:8px;border:2px solid #5177df;text-align:center;margin-bottom:1em;}
+#error-msg { color: #e457a7; margin-bottom:10px;font-size:1.06em;font-weight:bold;}
+/* Decorations - Balloons */
+.balloons-strip { width:100vw; height:84px; position:relative; top:0; left:0; z-index:120; display:flex; justify-content:center; align-items:flex-end; }
+.balloon-static { width:48px; height:72px; margin: 0 18px; background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%); border-radius: 48% 52% 58% 46% / 77% 62% 38% 63%; box-shadow: 0 0px 18px #ffd70066; position: relative;}
+.balloon-static.blue { background: radial-gradient(circle at 60% 30%, #7eadf7 65%, #5177df 100%);}
+.balloon-static.pink { background: radial-gradient(circle at 60% 30%, #ffb6ec 70%, #e457a7 100%);}
+.balloon-static .string { position: absolute; top:72px; left:22px; width:5px; height:46px; background:#f2ca6e; border-radius:32px;}
+/* Decorations - Lights */
+.lights-strip { width:100vw; height:38px; position:relative; z-index:119; top:-18px; display:flex; justify-content:center; align-items:flex-end; }
+.bulb { width: 26px; height: 26px; margin: 0 12px; border-radius: 50%; background: #ffe666; box-shadow: 0 0px 14px #ffd700c2;}
+.bulb.blue { background:#5177df; box-shadow: 0 0px 10px #5177dfa2;}
+.bulb.pink { background: #e457a7; box-shadow: 0 0px 10px #e457a7a2;}
+.bulb.green{ background:#65e469; box-shadow:0 0px 10px #54cf90a2;}
+/* Cake - Realistic */
+.cake-area { width: 100vw; text-align: center; margin: 2rem 0 0.8rem 0;}
+.cake { display: inline-block; position: relative; width: 170px; height: 148px; margin: 0 auto 0;}
+.cake-body { position:absolute; left:0; bottom:0; width:170px; height:70px; background:#a55e23; border-radius:0 0 60px 60px/0 0 70px 70px; box-shadow:0 11px 32px #a55e2328;}
+.cake-icing-top { position:absolute; left:14px; top:18px; width:142px;height:42px;background:#fffbe7; border-radius:46px 48px 30px 34px/70px 41px 28px 58px; z-index:1; box-shadow:0 2px 8px #fffbe7;}
+.cake-choc-drip {position:absolute;left:0;top:59px;width:170px;height:17px;background:#532a10;border-radius:18px 32px 18px 30px/20px 25px 20px 25px;}
+.cake-candle { position:absolute; top:14px; left:35px; width:10px; height:36px; background:#5177df; border-radius:13px;}
+.cake-candle2 { left:78px;}
+.cake-candle3 { left:122px;}
+.cake-flame { position: absolute;top:8px;width:15px;height:20px;left:36px;background: radial-gradient(circle at 60% 30%, #FBB034 55%, #F9DF56 90%); border-radius:50% 60% 30% 50%/68% 43% 66% 38%; box-shadow:0 0 20px 12px #ffe666;animation:candleFlicker 2.2s infinite;}
+.cake-flame.off {display:none;}
+.cake-flame2 {left:79px;}
+.cake-flame3 {left:123px;}
+@keyframes candleFlicker {0%,100%{width:14px;height:19px;transform:rotate(-9deg);} 30%{width:12px;height:17px;transform:rotate(7deg);} 70%{width:17px;height:22px;transform:rotate(-6deg);} }
+.cake-text { font-family: 'Pacifico',cursive; color: #ffe666; font-size: 1.18em; margin: 1em 0 0.2em 0; text-shadow: 0 0 6px #5177df99;}
+.happy-text { font-size: 2.2em; font-family: 'Pacifico',cursive; color:#ffe666; text-shadow: 0 0 28px #5177dfa0, 3px 3px 10px #222; margin:1rem 0;}
 .confetti { position:fixed; pointer-events:none; left:0; top:0; width:100vw; height:100vh; overflow:hidden; z-index:200; }
-.confetti-piece { position:absolute;width:18px; height:18px; border-radius:40%; opacity:0.78; animation:confetti-fall 2.7s linear forwards;}
-@keyframes confetti-fall {0% {opacity:0; transform:translateY(-44px);}20% {opacity:0.8;}100% {opacity:1; transform:translateY(96vh);}}
+.confetti-piece { position:absolute;width:18px; height:18px; border-radius:40%; opacity:0.81; animation:confetti-pop 2.2s linear forwards;}
+@keyframes confetti-pop {0% {opacity:0; transform:scale(0.5);} 10% {opacity:.8;} 100% {opacity:1; transform:translateY(55vh) scale(1.2);}}
+/* Slideshow */
 .slideshow-container { position: relative; max-width: 340px; margin: 2rem auto 3rem auto; min-height: 370px; background: #18181a; border-radius: 28px; overflow: hidden; box-shadow: 0 6px 28px 0 #5177df2c;}
 .slide { display: none; flex-direction: column; align-items: center; justify-content: center; height: 370px; transition: opacity 0.6s; opacity: 0;}
 .slide img { max-width: 270px; height: 320px; border-radius: 20px; object-fit: cover; box-shadow: 0 6px 24px 0 #5177df44; border: 4px solid #ffe666;}
@@ -61,53 +64,61 @@ audio { margin: 1em auto; outline: none; border-radius: 12px; width: 90%; backgr
 .lovely-message { font-size: 1.45em; max-width:440px; margin:3em auto 1em auto; background: #232336; color:#ffe666; border-radius:18px; padding:1.7em 1.2em; font-family:'Pacifico',cursive; letter-spacing:0.5px; box-shadow:0 2px 18px #5177df1a; text-shadow:0 0 8px #5177df33;}
 @media (max-width:650px) {
     .slideshow-container { max-width: 98vw;}
-    .cake { width:88px;height:88px;}
+    .cake { width:115px;height:100px;}
 }
 </style>
 </head>
 <body>
-<!-- Screen 1: "Hiii Saheli" -->
+<!-- Screen 1: "Hiii Saheli" + password -->
 <div class="screen active" id="screen1">
     <div class="bigtext">Hiii Saheli</div>
-    <button class="button" onclick="nextScreen(2)">Next</button>
+    <div style="font-size:1.18em;margin: 1em 0;color:#ffe666;">Type your secret password to unlock your birthday surprise!</div>
+    <form id="pwForm" autocomplete="off" onsubmit="event.preventDefault(); checkPassword();">
+        <input type="password" id="pwInput" placeholder="Enter password">
+        <div id="error-msg"></div>
+        <button class="button" type="submit">Unlock</button>
+    </form>
 </div>
-<!-- Screen 2: "It's your special day!" -->
+<!-- Screen 2: Balloons + Lights + Cake + Blow Out -->
 <div class="screen" id="screen2">
-    <div class="bigtext">It's your special day</div>
-    <button class="button" onclick="nextScreen(3)">Next</button>
-</div>
-<!-- Screen 3: "It's your birthday!" -->
-<div class="screen" id="screen3">
-    <div class="bigtext">It's your birthday!</div>
-    <button class="button" onclick="nextScreen(4)">Continue</button>
-</div>
-<!-- Screen 4: Blackout, Turn on Lights -->
-<div class="screen black-bg" id="screen4">
-    <div class="bigtext" style="color:#ffe666; text-shadow:0 0 8px #ffe66633;">
-        Time to brighten up the party!
+    <div class="balloons-strip">
+        <div class="balloon-static"></div>
+        <div class="balloon-static blue"></div>
+        <div class="balloon-static pink"></div>
+        <div class="balloon-static"></div>
+        <div class="balloon-static blue"></div>
+        <div class="balloon-static pink"></div>
+        <div class="balloon-static"></div>
+        <!-- String for each balloon -->
+        <div class="balloon-static" style="display:none;"></div>
     </div>
-    <button class="button" onclick="turnOnLights()">Turn On The Lights</button>
-</div>
-<!-- Decorations & Cake -->
-<div class="screen" id="screen5">
-    <div class="lights-strip" id="lights-strip"></div>
-    <div class="balloons-area" id="balloons-area"></div>
+    <div class="lights-strip">
+        <div class="bulb"></div>
+        <div class="bulb blue"></div>
+        <div class="bulb pink"></div>
+        <div class="bulb green"></div>
+        <div class="bulb blue"></div>
+        <div class="bulb"></div>
+        <div class="bulb pink"></div>
+    </div>
     <div>
-      <div class="happy-text">Happy Birthday Saheli!</div>
+        <div class="happy-text">Happy Birthday Saheli!</div>
     </div>
     <div class="cake-area">
         <div class="cake" id="cake">
-            <div class="cake-base"></div>
-            <div class="cake-icing"></div>
-            <div class="cake-candle" id="candle"></div>
-            <div class="cake-flame" id="flame"></div>
+            <div class="cake-body"></div>
+            <div class="cake-choc-drip"></div>
+            <div class="cake-icing-top"></div>
+            <div class="cake-candle"></div><div class="cake-flame" id="flame1"></div>
+            <div class="cake-candle cake-candle2"></div><div class="cake-flame cake-flame2" id="flame2"></div>
+            <div class="cake-candle cake-candle3"></div><div class="cake-flame cake-flame3" id="flame3"></div>
         </div>
-        <div class="cake-text">Chocolate Cake, just for you!</div>
+        <div class="cake-text">A real chocolate cake just for you!</div>
     </div>
     <button class="button" onclick="blowCandles()">Blow Out The Candles</button>
 </div>
 <!-- Confetti + Slideshow -->
-<div class="screen" id="screen6">
+<div class="screen" id="screen3">
     <div class="confetti" id="confetti"></div>
     <div class="slideshow-container" id="slideshow">
         <!-- Slides - add 50+ below by duplicating! -->
@@ -119,7 +130,7 @@ audio { margin: 1em auto; outline: none; border-radius: 12px; width: 90%; backgr
             <img src="https://drive.google.com/uc?export=view&id=1t2a5AYFoZRmHSWRIgvMEsbIxCzpFd6zv" alt="Pic 2">
             <div class="caption">You light up the world just by being you!</div>
         </div>
-        <!-- Copy, paste and update the img src for 50+ images! -->
+        <!-- COPY AND UPDATE FOR 50+ IMAGES -->
     </div>
     <section class="music-section">
         <div class="playlist-label">Background Music</div>
@@ -144,56 +155,54 @@ audio { margin: 1em auto; outline: none; border-radius: 12px; width: 90%; backgr
     </div>
 </div>
 <script>
-let currentScreen = 1;
-function nextScreen(n) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen'+n).classList.add('active');
-    currentScreen = n;
-}
-function turnOnLights() {
-    nextScreen(5);
-    let strip = document.getElementById('lights-strip');
-    strip.innerHTML = '';
-    let colors = ['','blue','pink','green','blue','','pink'];
-    colors.forEach(c=>{
-        let bulb = document.createElement('div');
-        bulb.className = 'bulb' + (c?' '+c:'');
-        strip.appendChild(bulb);
-    });
-    let bArea = document.getElementById('balloons-area');
-    bArea.innerHTML = '';
-    let bcolors = ['','blue','pink',''];
-    for(let i=0;i<12;i++){
-        let balloon = document.createElement('div');
-        balloon.className = "balloon " + bcolors[Math.floor(Math.random()*bcolors.length)];
-        balloon.style.left = (5+i*8+Math.random()*7)+"vw";
-        balloon.style.animationDelay = (Math.random()*7)+"s";
-        balloon.innerHTML = "<div class='string'></div>";
-        bArea.appendChild(balloon);
+function checkPassword() {
+    var input = document.getElementById("pwInput").value.trim();
+    var errorMsg = document.getElementById("error-msg");
+    if(input.toUpperCase() === "SAHELI") {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen2').classList.add('active');
+        errorMsg.innerHTML = "";
+    } else {
+        errorMsg.innerText = "That is not the secret password. Try again!";
+        document.getElementById("pwInput").focus();
     }
 }
+document.getElementById("pwInput").addEventListener("keydown",function(e){
+    if(e.key === "Enter") checkPassword();
+});
+// Cake blow out interaction
 function blowCandles() {
-    document.getElementById('flame').classList.add('off');
-    document.getElementById('candle').classList.add('off');
+    document.getElementById('flame1').classList.add('off');
+    document.getElementById('flame2').classList.add('off');
+    document.getElementById('flame3').classList.add('off');
     showConfetti();
     setTimeout(function(){
-        nextScreen(6);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen3').classList.add('active');
         startSlideshow();
         autoPlayMusic();
-    }, 1200);
+    }, 1400);
 }
 function showConfetti(){
     let container = document.getElementById('confetti');
     container.innerHTML = '';
-    for(let i=0;i<45;i++){
+    // Centered around cake, but fill whole screen for pop effect
+    let popX = window.innerWidth/2-50;
+    let popY = window.innerHeight/2-70;
+    for(let i=0;i<35;i++){
         let piece = document.createElement('div');
         piece.classList.add('confetti-piece');
         piece.style.background = ["#f7b801","#5177df","#e457a7","#65e469"][Math.floor(Math.random()*4)];
-        piece.style.left = Math.random()*100 + "vw";
-        piece.style.animationDuration = (1.6+Math.random()*1.5)+'s';
+        let angle = (Math.random()*2*Math.PI);
+        let radius = 55 + Math.random()*130;
+        let x = popX + Math.cos(angle)*radius;
+        let y = popY + Math.sin(angle)*radius;
+        piece.style.left = x + "px";
+        piece.style.top = (y<0?5:y) + "px";
+        piece.style.animationDuration = (1.3+Math.random()*1.1)+'s';
         piece.style.zIndex = 222;
         container.appendChild(piece);
-        setTimeout(()=>{piece.remove();},2200);
+        setTimeout(()=>{piece.remove();},1800);
     }
 }
 const randomCaptions = [
@@ -228,12 +237,13 @@ function startSlideshow() {
         if(idx >= slides.length){
             clearInterval(interval);
             setTimeout(function(){
-                nextScreen('finalMsgScreen');
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('finalMsgScreen').classList.add('active');
             }, 2000);
         }else{
             showSlide(idx);
         }
-    }, 2600);
+    }, 2700);
 }
 function autoPlayMusic(){ document.getElementById('audio-player').play(); }
 document.getElementById('music-select').onchange = function(){
