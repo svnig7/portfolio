@@ -1,531 +1,466 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Happy Birthday Ginni Jatav!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css?family=Pacifico|Montserrat:400,700" rel="stylesheet">
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(120deg, #ffde59 0%, #5177df 100%);
-            color: #364f6b;
-            overflow-x: hidden;
-        }
-        header {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-        }
-        h1 {
-            font-family: 'Pacifico', cursive;
-            font-size: 3rem;
-            color: #f7b801;
-            text-shadow: 2px 2px 12px #5177df66;
-            margin-bottom: 0.5rem;
-        }
-        h2 {
-            font-size: 1.2rem;
-            color: #5177df;
-            margin-bottom: 1rem;
-        }
-        .countdown {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            background: #fffbe7e8;
-            color: #5177df;
-            border-radius: 14px;
-            display: inline-block;
-            padding: 0.8em 1.2em;
-            box-shadow: 0 4px 16px #364f6b22;
-        }
-        /* Balloons */
-        .balloons-area {
-            position: fixed;
-            left:0; right:0;
-            top:0; height: 100vh;
-            z-index: 101;
-            pointer-events: none;
-        }
-        .balloon {
-            position: absolute;
-            bottom: -80px;
-            width: 44px;
-            height: 66px;
-            background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%);
-            border-radius: 46% 54% 54% 46% / 80% 65% 35% 60%;
-            box-shadow: 0 0px 30px #ffd70066;
-            animation: balloonUp 12s linear infinite;
-        }
-        .balloon.blue { background: radial-gradient(circle at 60% 30%, #7eadf7 65%, #5177df 100%);}
-        .balloon.pink { background: radial-gradient(circle at 60% 30%, #ffb6ec 70%, #e457a7 100%);}
-        .balloon .string {
-            position: absolute;
-            top: 62px; left: 19px;
-            width: 4px; height: 48px;
-            background: #f2ca6e;
-            border-radius: 32px;
-        }
-        @keyframes balloonUp {
-            to {bottom: 110vh;}
-        }
-        /* Decorative Lights */
-        .lights-strip {
-            width:100vw;
-            height:54px;
-            position:fixed;
-            top:0; left:0;
-            z-index:102;
-            display:flex;
-            justify-content:center;
-            align-items:flex-end;
-            pointer-events:none;
-        }
-        .bulb {
-            width: 26px;
-            height: 26px;
-            margin: 0 14px;
-            border-radius: 50%;
-            background: #ffe666;
-            box-shadow: 0 0px 20px #ffd700c2;
-            animation: twinkle 1.7s infinite alternate;
-        }
-        .bulb.blue { background:#5177df; box-shadow: 0 0px 16px #5177dfa2;}
-        .bulb.pink { background: #e457a7; box-shadow: 0 0px 16px #e457a7a2;}
-        .bulb.green{ background:#65e469; box-shadow:0 0px 16px #54cf90a2;}
-        @keyframes twinkle {
-            0% { opacity: .83;}
-            100% { opacity: 1;}
-        }
-        /* Cake */
-        .cake-area {
-            width: 100vw;
-            text-align: center;
-            margin: 2rem 0 0.5rem 0;
-        }
-        .cake {
-            display: inline-block;
-            position: relative;
-            width: 124px;
-            height: 124px;
-            margin: 0 auto 0;
-        }
-        .cake-base { position:absolute; bottom:0; left:2px; width:120px; height:60px; background:#ffe666; border-radius:0 0 38px 38px/0 0 52px 52px; box-shadow:0 6px 16px #ffe66655;}
-        .cake-icing {position:absolute; left:2px; top:38px; width:120px; height:31px; background:#fffbe7; border-radius: 38px 38px 22px 22px/46px 66px 17px 17px; box-shadow:0 2px 8px #f7b80177;}
-        .cake-candle { position:absolute; left:59px; top:20px; width:5px; height:28px; background:#5177df; border-radius:6px;}
-        .cake-flame { position:absolute; left:59px; top:12px; width:10px; height:19px; background: radial-gradient(circle at 60% 30%, #FBB034 55%, #F9DF56 90%); border-radius: 50% 60% 30% 50%/58% 43% 60% 28%; box-shadow:0 0 14px 8px #ffe666; animation: candleFlicker 2s infinite;}
-        @keyframes candleFlicker {0%,100%{width:12px;height:19px;transform: rotate(-9deg);} 30%{width:10px;height:17px;transform:rotate(9deg);} 70%{width:13px;height:22px;transform:rotate(-6deg);} }
-        /* Slideshow */
-        .slideshow-container {
-            position: relative;
-            max-width: 340px;
-            margin: 2rem auto 3rem auto;
-            min-height: 370px;
-            background: #fffdedc2;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 6px 28px 0 #5177df2c;
-        }
-        .slide {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 370px;
-            transition: opacity 0.6s;
-            opacity: 0;
-        }
-        .slide img {
-            max-width: 270px;
-            height: 320px;
-            border-radius: 20px;
-            object-fit: cover;
-            box-shadow: 0 6px 24px 0 #5177df44;
-            border: 4px solid #ffe666;
-        }
-        .slide.show {
-            display: flex;
-            opacity: 1;
-            animation: revealPhoto 1.5s;
-        }
-        @keyframes revealPhoto {
-            0% { opacity: 0; transform: scale(0.92);}
-            75% { opacity: 0.9; transform: scale(1.04);}
-            100% { opacity: 1; transform: scale(1);}
-        }
-        .caption {
-            margin-top: 0.8em;
-            font-style: italic;
-            background: #5177df14;
-            color: #364f6b;
-            padding: 0.4em 1em;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        /* Slideshow controls */
-        .prev, .next {
-            cursor: pointer;
-            position: absolute;
-            top: 49%;
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            margin-top: -22px;
-            color: #fff;
-            background: #5177dfcc;
-            border-radius: 50%;
-            border: none;
-            font-size: 1.8em;
-            font-weight: bold;
-            transition: background 0.2s;
-            box-shadow: 0 2px 10px #ffde5965;
-            z-index: 2;
-        }
-        .next { right: 16px; }
-        .prev { left: 16px; }
-        .prev:hover, .next:hover { background: #f7b801d6; color: #5177df;}
-        /* Loving Quotes */
-        .quotes {
-            background: rgba(255,255,255,0.83);
-            border-radius: 17px;
-            margin: 2rem auto;
-            max-width: 650px;
-            padding: 1.2rem;
-            box-shadow: 0 4px 24px 0 #5177df24;
-        }
-        .quote {
-            font-size: 1.18rem;
-            font-style: italic;
-            margin: 1.1rem 0;
-            color: #364f6b;
-            transition: color 0.3s;
-        }
-        .quote:hover {
-            color: #5177df;
-            text-shadow: 0 0 8px #ffe6667b;
-        }
-        /* Playlist */
-        .music-section {
-            text-align: center;
-            margin: 2rem auto;
-        }
-        .playlist-label {
-            padding: 0.4em 1em;
-            font-weight: 600;
-            color: #364f6b;
-            margin-bottom: 0.8em;
-            background: #ffe66677;
-            border-radius: 12px;
-            display: inline-block;
-        }
-        select {
-            font-size: 1em;
-            padding: 0.2em 1em;
-            border-radius: 10px;
-            border: 2px solid #5177df;
-            margin-bottom: 1em;
-        }
-        audio {
-            margin: 1em auto;
-            outline: none;
-            border-radius: 12px;
-        }
-        /* Confetti */
-        .confetti {
-            position: fixed;
-            pointer-events: none;
-            left: 0; top: 0; width: 100vw; height: 100vh;
-            overflow: hidden;
-            z-index: 99;
-        }
-        .confetti-piece {
-            position: absolute;
-            width: 18px; height: 18px;
-            border-radius: 40%;
-            opacity: 0.62;
-            animation: confetti-fall 2.2s linear forwards;
-        }
-        @keyframes confetti-fall {
-            0% {opacity:0; transform:translateY(-44px);}
-            20% {opacity:0.8;}
-            100% {opacity:1; transform:translateY(96vh);}
-        }
-        /* Password Overlay */
-        #password-overlay {
-            position: fixed;
-            background: linear-gradient(120deg,#fde5ff 0%, #ffe666 100%);
-            left:0; top:0; right:0; bottom:0;
-            z-index:9999;
-            text-align:center;
-            padding-top:18vh;
-            min-height:100vh;
-            color:#5177df;
-        }
-        #password-box {
-            background: #fff;
-            border-radius: 22px;
-            box-shadow: 0 6px 28px #5177df50;
-            display: inline-block;
-            padding: 2.5em 2.5em 2em 2.5em;
-            font-size: 1.3em;
-        }
-        #password-box input[type="password"] {
-            font-size: 1.1em;
-            padding: 0.5em 1em;
-            border-radius:8px;
-            border:2px solid #5177df;
-            margin-bottom:1em;
-            margin-top:0.4em;
-            text-align:center;
-        }
-        #password-box button {
-            font-size: 1em;
-            background: #ffe666;
-            color: #5177df;
-            border-radius: 10px;
-            border: none;
-            padding: 0.6em 1.8em;
-            font-weight: bold;
-            margin-top: 1em;
-            cursor:pointer;
-        }
-        #password-box button:hover {
-            background: #fbb034;
-            color: #fff;
-        }
-        #wrong-pw {
-            color:#e457a7;
-            font-size:0.92em;
-            font-weight: bold;
-            margin-top:0.7em;
-        }
-        /* Responsive */
-        @media (max-width:650px) {
-            .slideshow-container, .quotes { max-width: 96vw;}
-            .cake { width:90px;height:90px;}
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Happy Birthday Saheli!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css?family=Pacifico|Montserrat:400,700" rel="stylesheet">
+<style>
+/* General Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
+    overflow-x: hidden;
+}
+.screen {
+    display: none;
+    min-height: 100vh;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+.screen.active { display: flex; }
+.bigtext {
+    font-size: 2.7rem;
+    font-family: 'Pacifico', cursive;
+    margin: 2rem 0;
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+.button {
+    background: linear-gradient(120deg,#f7b801, #5177df);
+    color: #fff;
+    border: none;
+    font-size: 1.4rem;
+    border-radius: 12px;
+    padding: 0.8rem 2.2rem;
+    cursor: pointer;
+    font-family: 'Montserrat',sans-serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 2rem auto 0 auto;
+    box-shadow: 0 4px 20px #5177df60;
+    transition: background 0.25s;
+}
+.button:hover {
+    background: linear-gradient(120deg,#ffe666,#5177df);
+}
+/* Blackout */
+.black-bg {
+    background: #111;
+    color: #ffe666;
+}
+/* Lights Decoration */
+.lights-strip {
+    width:100vw;
+    height:54px;
+    position:fixed;
+    top:0; left:0;
+    z-index:120;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    pointer-events:none;
+}
+.bulb {
+    width: 26px;
+    height: 26px;
+    margin: 0 14px;
+    border-radius: 50%;
+    background: #ffe666;
+    box-shadow: 0 0px 20px #ffd700c2;
+    animation: twinkle 1.7s infinite alternate;
+}
+.bulb.blue { background:#5177df; box-shadow: 0 0px 16px #5177dfa2;}
+.bulb.pink { background: #e457a7; box-shadow: 0 0px 16px #e457a7a2;}
+.bulb.green{ background:#65e469; box-shadow:0 0px 16px #54cf90a2;}
+@keyframes twinkle {0% { opacity:.8;}100% {opacity:1;}}
+/* Balloons */
+.balloons-area {
+    position: fixed;
+    left:0; right:0;
+    top:54px; height: 100vh;
+    z-index:110;
+    pointer-events: none;
+}
+.balloon {
+    position: absolute;
+    bottom: -80px;
+    width: 44px;
+    height: 66px;
+    background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%);
+    border-radius: 46% 54% 54% 46% / 80% 65% 35% 60%;
+    box-shadow: 0 0px 30px #ffd70066;
+    animation: balloonUp 12s linear infinite;
+}
+.balloon.blue { background: radial-gradient(circle at 60% 30%, #7eadf7 65%, #5177df 100%);}
+.balloon.pink { background: radial-gradient(circle at 60% 30%, #ffb6ec 70%, #e457a7 100%);}
+.balloon .string {
+    position: absolute;
+    top: 62px; left: 19px;
+    width: 4px; height: 48px;
+    background: #f2ca6e;
+    border-radius: 32px;
+}
+@keyframes balloonUp { to {bottom: 110vh;} }
+/* Birthday Cake */
+.cake-area {
+    width: 100vw;
+    text-align: center;
+    margin: 2rem 0 0.5rem 0;
+}
+.cake {
+    display: inline-block;
+    position: relative;
+    width: 124px;
+    height: 124px;
+    margin: 0 auto 0;
+}
+.cake-base { position:absolute; bottom:0; left:2px; width:120px; height:60px; background:#6c3f11; border-radius:0 0 38px 38px/0 0 52px 52px; box-shadow:0 6px 16px #ffe6661d;}
+.cake-icing {position:absolute; left:2px; top:38px; width:120px; height:31px; background:#fffbe7; border-radius: 38px 38px 22px 22px/46px 66px 17px 17px; box-shadow:0 2px 8px #fffbe7;}
+.cake-candle { position:absolute; left:59px; top:20px; width:7px; height:28px; background:#5177df; border-radius:6px;}
+.cake-flame { position:absolute; left:59px; top:7px; width:13px; height:24px; background: radial-gradient(circle at 60% 30%, #FBB034 55%, #F9DF56 90%); border-radius: 50% 60% 30% 50%/58% 43% 60% 28%; box-shadow:0 0 22px 10px #ffe666; animation: candleFlicker 2.3s infinite;}
+@keyframes candleFlicker {0%,100%{width:12px;height:19px;transform:rotate(-9deg);} 30%{width:10px;height:17px;transform:rotate(9deg);} 70%{width:13px;height:22px;transform:rotate(-6deg);} }
+.cake-flame.off { display:none; }
+.cake-candle.off { background: #333; }
+.cake-icing {
+    border-bottom: 5px solid #f7b801;
+}
+.cake-text {
+    font-family: 'Pacifico',cursive;
+    color: #ffe666;
+    font-size: 1.2em;
+    margin: 1em 0 0.5em 0;
+    text-shadow: 0 0 6px #5177df99;
+}
+/* Happy Birthday Text Reveal */
+.happy-text {
+    font-size: 2.8em;
+    font-family: 'Pacifico',cursive;
+    color:#ffe666;
+    text-shadow: 0 0 28px #5177dfa0, 3px 3px 10px #222;
+    animation: shineText 2.7s ease-in-out both;
+    margin:1rem 0;
+    letter-spacing: 2px;
+}
+@keyframes shineText {
+    0% {opacity:0;filter: blur(10px);}
+    60% {opacity:1;filter:blur(0px);}
+    85% {color:#fffbe7;}
+    100% {color:#ffe666;}
+}
+.confetti { position:fixed; pointer-events:none; left:0; top:0; width:100vw; height:100vh; overflow:hidden; z-index:200; }
+.confetti-piece { position:absolute;width:18px; height:18px; border-radius:40%; opacity:0.78; animation:confetti-fall 2.7s linear forwards;}
+@keyframes confetti-fall {0% {opacity:0; transform:translateY(-44px);}20% {opacity:0.8;}100% {opacity:1; transform:translateY(96vh);}}
+/* Slideshow */
+.slideshow-container {
+    position: relative;
+    max-width: 340px;
+    margin: 2rem auto 3rem auto;
+    min-height: 370px;
+    background: #18181a;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 6px 28px 0 #5177df2c;
+}
+.slide {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 370px;
+    transition: opacity 0.6s;
+    opacity: 0;
+}
+.slide img {
+    max-width: 270px;
+    height: 320px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 6px 24px 0 #5177df44;
+    border: 4px solid #ffe666;
+}
+.slide.show {
+    display: flex;
+    opacity: 1;
+    animation: revealPhoto 1.2s;
+}
+@keyframes revealPhoto {
+    0% { opacity: 0; transform: scale(0.92);}
+    75% { opacity: 0.9; transform: scale(1.04);}
+    100% { opacity: 1; transform: scale(1);}
+}
+.caption {
+    margin-top: 0.8em;
+    font-style: italic;
+    background: #5177df24;
+    color: #ffe666;
+    padding: 0.4em 1em;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+.music-section {
+    text-align: center;
+    margin: 2rem auto;
+    background: #232336;
+    padding:1em 0.5em;
+    border-radius: 14px;
+    box-shadow: 0 2px 14px #5177df18;
+}
+.playlist-label {
+    padding: 0.4em 1em;
+    font-weight: 600;
+    color: #ffe666;
+    margin-bottom: 0.6em;
+    background: #18181a;
+    border-radius: 12px;
+    display: inline-block;
+    font-size: 1.1em;
+}
+select {
+    font-size: 1em;
+    padding: 0.2em 1em;
+    border-radius: 10px;
+    border: 2px solid #5177df;
+    margin-bottom: 1em;
+    background:#5177dfaa;
+    color: #ffe666;
+}
+audio {
+    margin: 1em auto;
+    outline: none;
+    border-radius: 12px;
+    width: 90%;
+    background:#fffbe7;
+}
+.lovely-message {
+    font-size: 1.45em;
+    max-width:440px;
+    margin:3em auto 1em auto;
+    background: #232336;
+    color:#ffe666;
+    border-radius:18px;
+    padding:1.7em 1.2em;
+    font-family:'Pacifico',cursive;
+    letter-spacing:0.5px;
+    box-shadow:0 2px 18px #5177df1a;
+    text-shadow:0 0 8px #5177df33;
+}
+@media (max-width:650px) {
+    .slideshow-container { max-width: 98vw;}
+    .cake { width:88px;height:88px;}
+}
+</style>
 </head>
 <body>
-    <!-- PASSWORD OVERLAY -->
-    <div id="password-overlay">
-        <div id="password-box">
-            <div style="font-size:2em; color:#5177df; font-family:Pacifico;">Hi Ginni!</div>
-            <div style="padding:1em 0;font-size:1.12em;">Your surprise is waiting.<br>Enter your secret word:</div>
-            <input type="password" id="pw-input" placeholder="Enter password">
-            <div><button onclick="checkPassword()">Unlock</button></div>
-            <div id="wrong-pw"></div>
-        </div>
+
+<!-- Screen 1: "Hiii Saheli" -->
+<div class="screen active" id="screen1">
+    <div class="bigtext">Hiii Saheli</div>
+    <button class="button" onclick="nextScreen(2)">Next</button>
+</div>
+<!-- Screen 2: "It's your special day!" -->
+<div class="screen" id="screen2">
+    <div class="bigtext">It's your special day</div>
+    <button class="button" onclick="nextScreen(3)">Next</button>
+</div>
+<!-- Screen 3: "It's your birthday!" -->
+<div class="screen" id="screen3">
+    <div class="bigtext">It's your birthday!</div>
+    <button class="button" onclick="nextScreen(4)">Continue</button>
+</div>
+<!-- Screen 4: Blackout, Turn on Lights -->
+<div class="screen black-bg" id="screen4">
+    <div class="bigtext" style="color:#ffe666; text-shadow:0 0 8px #ffe66633;">
+        Time to brighten up the party!
     </div>
-    <!-- Decorative Lights -->
-    <div class="lights-strip">
-        <div class="bulb"></div>
-        <div class="bulb blue"></div>
-        <div class="bulb pink"></div>
-        <div class="bulb green"></div>
-        <div class="bulb blue"></div>
-        <div class="bulb"></div>
-        <div class="bulb pink"></div>
+    <button class="button" onclick="turnOnLights()">Turn On The Lights</button>
+</div>
+<!-- Decorations & Cake -->
+<div class="screen" id="screen5">
+    <div class="lights-strip" id="lights-strip"></div>
+    <div class="balloons-area" id="balloons-area"></div>
+    <div>
+      <div class="happy-text">Happy Birthday Saheli!</div>
     </div>
-    <!-- Balloons -->
-    <div class="balloons-area"></div>
-    <!-- Confetti Burst -->
-    <div class="confetti"></div>
-    <!-- CAKE AREA -->
     <div class="cake-area">
-        <div class="cake">
+        <div class="cake" id="cake">
             <div class="cake-base"></div>
             <div class="cake-icing"></div>
-            <div class="cake-candle"></div>
-            <div class="cake-flame"></div>
+            <div class="cake-candle" id="candle"></div>
+            <div class="cake-flame" id="flame"></div>
         </div>
-        <div style="font-family:Pacifico;color:#e457a7;font-size:1.2em;">Birthday Cake for You!</div>
+        <div class="cake-text">Chocolate Cake, just for you!</div>
     </div>
-    <!-- MAIN CONTENT -->
-    <div id="main-content" style="display:none">
-    <header>
-      <h1>Happy Birthday Ginni Jatav!</h1>
-      <h2>With all my love, joy, and lots of smiles on your special day</h2>
-      <div class="countdown" id="countdown"></div>
-    </header>
-    <!-- Slideshow -->
-    <section class="slideshow-container" id="slideshow">
-        <button class="prev" title="Previous Photo">&#10094;</button>
-        <button class="next" title="Next Photo">&#10095;</button>
-        <!-- PHOTO SLIDES: Replace src with your Drive image links below! -->
+    <button class="button" onclick="blowCandles()">Blow Out The Candles</button>
+</div>
+<!-- Confetti + Slideshow -->
+<div class="screen" id="screen6">
+    <div class="confetti" id="confetti"></div>
+    <div class="slideshow-container" id="slideshow">
+        <!-- Slides - add 50+ below by duplicating! -->
         <div class="slide show">
-            <img src="https://drive.google.com/uc?export=view&id=130azzPxCbxwlobGSWd67Fq0eJVc0_ryH" alt="Birthday Pic">
-            <div class="caption">Your smile brightens every day!</div>
+            <img src="https://drive.google.com/uc?export=view&id=130azzPxCbxwlobGSWd67Fq0eJVc0_ryH" alt="Pic 1">
+            <div class="caption">Your smile makes every moment magical.</div>
         </div>
         <div class="slide">
-            <img src="https://drive.google.com/uc?export=view&id=1t2a5AYFoZRmHSWRIgvMEsbIxCzpFd6zv" alt="Birthday Pic">
-            <div class="caption">You are the sunshine in my world.</div>
+            <img src="https://drive.google.com/uc?export=view&id=1t2a5AYFoZRmHSWRIgvMEsbIxCzpFd6zv" alt="Pic 2">
+            <div class="caption">You light up the world just by being you!</div>
         </div>
+        <!-- Duplicate the above slide block to add more photos up to 50+ -->
+        <!-- Example: 
         <div class="slide">
-            <img src="https://drive.google.com/uc?export=view&id=15MZ9XKQsV3G6D4LocDHQKMBmsG_y302h" alt="Birthday Pic">
-            <div class="caption">You make life magical just by being you.</div>
+            <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID" alt="Pic">
+            <div class="caption">A random lovely caption!</div>
         </div>
-        <div class="slide">
-            <img src="https://drive.google.com/uc?export=view&id=1iAUdkR48pvtDhuVej7e_0vZn23bW9iMI" alt="Birthday Pic">
-            <div class="caption">Every moment with you is precious.</div>
-        </div>
-        <div class="slide">
-            <img src="https://drive.google.com/uc?export=view&id=1X2Y3ZabcdEfghIjkLMNOPQ" alt="Birthday Pic">
-            <div class="caption">Magical moments together!</div>
-        </div>
-        <!-- Add more slides if you wish! -->
-    </section>
-    <!-- Loving Birthday Messages -->
-    <section class="quotes">
-        <div class="quote">“Happy Birthday Ginni! You fill my life with sunshine and love. May your day be as radiant as you are.”</div>
-        <div class="quote">“Every moment with you is a beautiful melody. Wishing you a birthday full of happiness and sweet surprises.”</div>
-        <div class="quote">“To the girl who colours my world blue and brightens my every day in yellow—Happy Birthday, Ginni!”</div>
-        <div class="quote">“No words can capture how wonderful you are, but today I hope my wishes come close.”</div>
-        <div class="quote">“Here’s to another year of laughter, love, and unforgettable moments with you.”</div>
-    </section>
-    <!-- Music Playlist Section -->
+        -->
+    </div>
     <section class="music-section">
-        <div class="playlist-label">Romantic Playlist</div>
+        <div class="playlist-label">Background Music</div>
         <select id="music-select">
-            <option value="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3">
-              Beautiful Instrumental
-            </option>
-            <option value="https://cdn.pixabay.com/audio/2023/02/07/audio_12fa2b387e.mp3">
-              Happy Romantic Vibes
-            </option>
-            <option value="https://cdn.pixabay.com/audio/2023/08/11/audio_14050d4f7b.mp3">
-              Love & Soul
-            </option>
-            <option value="https://cdn.pixabay.com/audio/2023/03/16/audio_11e135c7c5.mp3">
-              Dreamy Birthday Tune
-            </option>
-            <option value="https://cdn.pixabay.com/audio/2023/04/07/audio_12f17cc5fd.mp3">
-              Uplifting Happy Instrumental
-            </option>
+            <option value="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3">Beautiful Instrumental</option>
+            <option value="https://cdn.pixabay.com/audio/2023/02/07/audio_12fa2b387e.mp3">Romantic Vibes</option>
         </select>
         <audio id="audio-player" controls autoplay loop>
             <source src="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3" type="audio/mp3">
         </audio>
     </section>
-    <footer>
-        Made with 💛💙 for Ginni Jatav<br>
-        <span style="font-size:0.9em">Designed by <b>svnig7</b> — 2025</span>
-    </footer>
+</div>
+<!-- Final Lovely Message -->
+<div class="screen" id="finalMsgScreen">
+    <div class="lovely-message">
+        Happy Birthday, Saheli!<br>
+        You are my sunshine, my laughter, and my inspiration.<br>
+        Every moment with you is precious, every smile is a gift.<br>
+        Thank you for being you—kind, beautiful, and so deeply loved.<br>
+        Here’s to your happiest year yet. <br>
+        With all my love, always.
     </div>
-    <!-- SCRIPTS -->
-    <script>
-    // PASSWORD Logic
-    function checkPassword() {
-        var input = document.getElementById("pw-input").value.trim();
-        var wrongPw = document.getElementById("wrong-pw");
-        if(input.toUpperCase() === "SAHELI") {
-            document.getElementById("password-overlay").style.display = "none";
-            document.getElementById("main-content").style.display = "block";
-        } else {
-            wrongPw.innerText = "That is not the secret word. Try again!";
-        }
-    }
-    // Submit on Enter
-    document.getElementById("pw-input").addEventListener("keydown",function(e){
-        if(e.key === "Enter") checkPassword();
+</div>
+<script>
+let currentScreen = 1;
+function nextScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+    currentScreen = n;
+}
+
+function turnOnLights() {
+    nextScreen(5);
+    // Create lights on top
+    let strip = document.getElementById('lights-strip');
+    strip.innerHTML = '';
+    let colors = ['','blue','pink','green','blue','','pink'];
+    colors.forEach(c=>{
+        let bulb = document.createElement('div');
+        bulb.className = 'bulb' + (c?' '+c:'');
+        strip.appendChild(bulb);
     });
-
-    // COUNTDOWN TIMER
-    function birthdayCountdown(){
-        const countdown = document.getElementById("countdown");
-        const now = new Date();
-        // Next birthday: Dec 16
-        let year = (now.getMonth()>11 || (now.getMonth()==11 && now.getDate()>16)) ? now.getFullYear()+1 : now.getFullYear();
-        let birthday = new Date(year, 11, 16);
-        let diff = birthday - now;
-        let d = Math.floor(diff/(1000*60*60*24)), h = Math.floor((diff%(1000*60*60*24))/(1000*60*60)), m = Math.floor((diff%(1000*60*60))/(1000*60)), s = Math.floor((diff%(1000*60))/1000);
-        countdown.innerHTML = `<span>${d} days</span> <span>${h} hrs</span> <span>${m} mins</span> <span>${s} secs</span> until your birthday!`;
-        setTimeout(birthdayCountdown, 1000);
+    // Balloons
+    let bArea = document.getElementById('balloons-area');
+    bArea.innerHTML = '';
+    let bcolors = ['','blue','pink',''];
+    for(let i=0;i<12;i++){
+        let balloon = document.createElement('div');
+        balloon.className = "balloon " + bcolors[Math.floor(Math.random()*bcolors.length)];
+        balloon.style.left = (5+i*8+Math.random()*7)+"vw";
+        balloon.style.animationDelay = (Math.random()*7)+"s";
+        balloon.innerHTML = "<div class='string'></div>";
+        bArea.appendChild(balloon);
     }
-    birthdayCountdown();
+}
 
-    // BALLOONS
-    function createBalloons(){
-        let area = document.querySelector('.balloons-area');
-        let colors = ['','blue','pink'];
-        for(let i=0;i<7;i++){
-            let balloon = document.createElement('div');
-            balloon.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
-            balloon.style.left = (6+i*13+Math.random()*8)+"vw";
-            balloon.style.animationDelay = (Math.random()*7)+"s";
-            balloon.innerHTML = "<div class='string'></div>";
-            area.appendChild(balloon);
-        }
+function blowCandles() {
+    // Remove flames
+    document.getElementById('flame').classList.add('off');
+    document.getElementById('candle').classList.add('off');
+    // Confetti
+    showConfetti();
+    // Go to slideshow after delay
+    setTimeout(function(){
+        nextScreen(6);
+        startSlideshow();
+        autoPlayMusic();
+        // After slideshow, show message
+    }, 1200);
+}
+
+function showConfetti(){
+    let container = document.getElementById('confetti');
+    container.innerHTML = '';
+    for(let i=0;i<45;i++){
+        let piece = document.createElement('div');
+        piece.classList.add('confetti-piece');
+        piece.style.background = ["#f7b801","#5177df","#e457a7","#65e469"][Math.floor(Math.random()*4)];
+        piece.style.left = Math.random()*100 + "vw";
+        piece.style.animationDuration = (1.6+Math.random()*1.5)+'s';
+        piece.style.zIndex = 222;
+        container.appendChild(piece);
+        setTimeout(()=>{piece.remove();},2200);
     }
-    createBalloons();
+}
 
-    // SLIDESHOW & RANDOM CAPTION
-    const randomCaptions = [
-        "Your smile brightens every day!",
-        "You are the sunshine in my world.",
-        "You make life magical just by being you.",
-        "Every moment with you is precious.",
-        "You’re my favorite happiness.",
-        "Smiles are sweeter with you.",
-        "Coloring my world, simply by being in it.",
-        "Love grows deeper every day with you.",
-        "Magical moments together!",
-        "Every laugh with you is a treasure!",
-        "Dreams come true with you beside me."
-    ];
-    const slides = document.querySelectorAll(".slide");
-    let slideIdx = 0;
-    function showSlide(n) {
+// SLIDESHOW
+const randomCaptions = [
+    "Your smile makes every moment magical.",
+    "You light up the world just by being you!",
+    "Every day is a new adventure with you.",
+    "You're my favorite reason to smile.",
+    "Saheli, you make my heart happy.",
+    "Every memory with you shines bright.",
+    "Love grows deeper every day with you.",
+    "Magical moments together!",
+    "Every laugh with you is a treasure!",
+    "Dreams come true with you beside me.",
+    "Starlight, laughter, and your kindness."
+];
+
+// Add 50+ <div class="slide"> as you wish! (see above)
+
+function startSlideshow() {
+    // Fade in slideshow
+    let slides = document.querySelectorAll('#slideshow .slide');
+    let idx = 0;
+    let showSlide = function(n){
         slides.forEach((slide,i) => {
             slide.classList.remove("show");
             if(i === n) {
                 // change caption to random
-                slide.querySelector('.caption').textContent = randomCaptions[Math.floor(Math.random()*randomCaptions.length)];
+                let cap = slide.querySelector('.caption');
+                if(cap) cap.textContent = randomCaptions[Math.floor(Math.random()*randomCaptions.length)];
                 slide.classList.add("show");
             }
         });
     }
-    function nextSlide() {
-        slideIdx = (slideIdx+1)%slides.length;
-        showSlide(slideIdx);
-        confettiBurst();
-    }
-    function prevSlide() {
-        slideIdx = (slideIdx-1+slides.length)%slides.length;
-        showSlide(slideIdx);
-        confettiBurst();
-    }
-    document.querySelector(".next").onclick = nextSlide;
-    document.querySelector(".prev").onclick = prevSlide;
-    showSlide(slideIdx);
-
-    // CONFETTI BURST
-    function confettiBurst(){
-        let container = document.querySelector('.confetti');
-        for(let i=0;i<20;i++){
-            let piece = document.createElement('div');
-            piece.classList.add('confetti-piece');
-            piece.style.background = ["#f7b801","#5177df","#e457a7","#65e469"][Math.floor(Math.random()*4)];
-            piece.style.left = Math.random()*100 + "vw";
-            piece.style.animationDuration = (1.3+Math.random()*0.8)+'s';
-            piece.style.zIndex = 99;
-            container.appendChild(piece);
-            setTimeout(()=>{piece.remove();},1800);
+    showSlide(idx);
+    let interval = setInterval(function(){
+        idx++;
+        if(idx >= slides.length){
+            clearInterval(interval);
+            setTimeout(function(){
+                nextScreen('finalMsgScreen');
+            }, 2000);
+        }else{
+            showSlide(idx);
         }
-    }
-    setTimeout(confettiBurst,2000);
+    }, 2600); // 2.6s per pic
+}
 
-    // MUSIC SELECTOR
-    const audioPlayer = document.getElementById('audio-player');
-    document.getElementById('music-select').onchange = function(){
-        audioPlayer.src = this.value;
-        audioPlayer.play();
-    };
-
-    </script>
+// Background Music
+function autoPlayMusic(){ document.getElementById('audio-player').play(); }
+document.getElementById('music-select').onchange = function(){
+    let ap = document.getElementById('audio-player');
+    ap.src = this.value;
+    ap.play();
+};
+</script>
 </body>
 </html>
