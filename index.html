@@ -6,123 +6,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css?family=Pacifico|Montserrat:400,700" rel="stylesheet">
 <style>
-/* General Styles */
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Montserrat', sans-serif;
-    min-height: 100vh;
-    background: #111;
-    color: #fff;
-    overflow-x: hidden;
+    min-height: 100vh; background: #111;
+    color: #fff; overflow-x: hidden;
 }
-.screen {
-    display: none;
-    min-height: 100vh;
-    width: 100vw;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-}
+.screen { display: none; min-height: 100vh; width: 100vw; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
 .screen.active { display: flex; }
-.bigtext {
-    font-size: 2.7rem;
-    font-family: 'Pacifico', cursive;
-    margin: 2rem 0;
-    opacity: 0;
-    animation: fadeIn 1.5s forwards;
-}
+.bigtext { font-size: 2.7rem; font-family: 'Pacifico', cursive; margin: 2rem 0; opacity: 0; animation: fadeIn 1.5s forwards;}
 @keyframes fadeIn { to { opacity: 1; } }
-.button {
-    background: linear-gradient(120deg,#f7b801, #5177df);
-    color: #fff;
-    border: none;
-    font-size: 1.4rem;
-    border-radius: 12px;
-    padding: 0.8rem 2.2rem;
-    cursor: pointer;
-    font-family: 'Montserrat',sans-serif;
-    font-weight: bold;
-    letter-spacing: 1px;
-    margin: 2rem auto 0 auto;
-    box-shadow: 0 4px 20px #5177df60;
-    transition: background 0.25s;
-}
-.button:hover {
-    background: linear-gradient(120deg,#ffe666,#5177df);
-}
-/* Blackout */
-.black-bg {
-    background: #111;
-    color: #ffe666;
-}
-/* Lights Decoration */
-.lights-strip {
-    width:100vw;
-    height:54px;
-    position:fixed;
-    top:0; left:0;
-    z-index:120;
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    pointer-events:none;
-}
-.bulb {
-    width: 26px;
-    height: 26px;
-    margin: 0 14px;
-    border-radius: 50%;
-    background: #ffe666;
-    box-shadow: 0 0px 20px #ffd700c2;
-    animation: twinkle 1.7s infinite alternate;
-}
+.button { background: linear-gradient(120deg,#f7b801, #5177df); color: #fff; border: none; font-size: 1.4rem; border-radius: 12px; padding: 0.8rem 2.2rem; cursor: pointer; font-family: 'Montserrat',sans-serif; font-weight: bold; letter-spacing: 1px; margin: 2rem auto 0 auto; box-shadow: 0 4px 20px #5177df60; transition: background 0.25s;}
+.button:hover { background: linear-gradient(120deg,#ffe666,#5177df); }
+.black-bg { background: #111; color: #ffe666; }
+.lights-strip { width:100vw; height:54px; position:fixed; top:0; left:0; z-index:120; display:flex; justify-content:center; align-items:flex-end; pointer-events:none;}
+.bulb { width: 26px; height: 26px; margin: 0 14px; border-radius: 50%; background: #ffe666; box-shadow: 0 0px 20px #ffd700c2; animation: twinkle 1.7s infinite alternate; }
 .bulb.blue { background:#5177df; box-shadow: 0 0px 16px #5177dfa2;}
 .bulb.pink { background: #e457a7; box-shadow: 0 0px 16px #e457a7a2;}
 .bulb.green{ background:#65e469; box-shadow:0 0px 16px #54cf90a2;}
 @keyframes twinkle {0% { opacity:.8;}100% {opacity:1;}}
-/* Balloons */
-.balloons-area {
-    position: fixed;
-    left:0; right:0;
-    top:54px; height: 100vh;
-    z-index:110;
-    pointer-events: none;
-}
-.balloon {
-    position: absolute;
-    bottom: -80px;
-    width: 44px;
-    height: 66px;
-    background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%);
-    border-radius: 46% 54% 54% 46% / 80% 65% 35% 60%;
-    box-shadow: 0 0px 30px #ffd70066;
-    animation: balloonUp 12s linear infinite;
-}
+.balloons-area { position: fixed; left:0; right:0; top:54px; height: 100vh; z-index:110; pointer-events: none;}
+.balloon { position: absolute; bottom: -80px; width: 44px; height: 66px; background: radial-gradient(circle at 60% 30%, #ffe666 65%, #f7b801 100%); border-radius: 46% 54% 54% 46% / 80% 65% 35% 60%; box-shadow: 0 0px 30px #ffd70066; animation: balloonUp 12s linear infinite;}
 .balloon.blue { background: radial-gradient(circle at 60% 30%, #7eadf7 65%, #5177df 100%);}
 .balloon.pink { background: radial-gradient(circle at 60% 30%, #ffb6ec 70%, #e457a7 100%);}
-.balloon .string {
-    position: absolute;
-    top: 62px; left: 19px;
-    width: 4px; height: 48px;
-    background: #f2ca6e;
-    border-radius: 32px;
-}
+.balloon .string { position: absolute; top: 62px; left: 19px; width: 4px; height: 48px; background: #f2ca6e; border-radius: 32px;}
 @keyframes balloonUp { to {bottom: 110vh;} }
 /* Birthday Cake */
-.cake-area {
-    width: 100vw;
-    text-align: center;
-    margin: 2rem 0 0.5rem 0;
-}
-.cake {
-    display: inline-block;
-    position: relative;
-    width: 124px;
-    height: 124px;
-    margin: 0 auto 0;
-}
+.cake-area { width: 100vw; text-align: center; margin: 2rem 0 0.5rem 0;}
+.cake { display: inline-block; position: relative; width: 124px; height: 124px; margin: 0 auto 0;}
 .cake-base { position:absolute; bottom:0; left:2px; width:120px; height:60px; background:#6c3f11; border-radius:0 0 38px 38px/0 0 52px 52px; box-shadow:0 6px 16px #ffe6661d;}
 .cake-icing {position:absolute; left:2px; top:38px; width:120px; height:31px; background:#fffbe7; border-radius: 38px 38px 22px 22px/46px 66px 17px 17px; box-shadow:0 2px 8px #fffbe7;}
 .cake-candle { position:absolute; left:59px; top:20px; width:7px; height:28px; background:#5177df; border-radius:6px;}
@@ -130,130 +41,24 @@ body {
 @keyframes candleFlicker {0%,100%{width:12px;height:19px;transform:rotate(-9deg);} 30%{width:10px;height:17px;transform:rotate(9deg);} 70%{width:13px;height:22px;transform:rotate(-6deg);} }
 .cake-flame.off { display:none; }
 .cake-candle.off { background: #333; }
-.cake-icing {
-    border-bottom: 5px solid #f7b801;
-}
-.cake-text {
-    font-family: 'Pacifico',cursive;
-    color: #ffe666;
-    font-size: 1.2em;
-    margin: 1em 0 0.5em 0;
-    text-shadow: 0 0 6px #5177df99;
-}
-/* Happy Birthday Text Reveal */
-.happy-text {
-    font-size: 2.8em;
-    font-family: 'Pacifico',cursive;
-    color:#ffe666;
-    text-shadow: 0 0 28px #5177dfa0, 3px 3px 10px #222;
-    animation: shineText 2.7s ease-in-out both;
-    margin:1rem 0;
-    letter-spacing: 2px;
-}
-@keyframes shineText {
-    0% {opacity:0;filter: blur(10px);}
-    60% {opacity:1;filter:blur(0px);}
-    85% {color:#fffbe7;}
-    100% {color:#ffe666;}
-}
+.cake-icing { border-bottom: 5px solid #f7b801;}
+.cake-text { font-family: 'Pacifico',cursive; color: #ffe666; font-size: 1.2em; margin: 1em 0 0.5em 0; text-shadow: 0 0 6px #5177df99;}
+.happy-text { font-size: 2.8em; font-family: 'Pacifico',cursive; color:#ffe666; text-shadow: 0 0 28px #5177dfa0, 3px 3px 10px #222; animation: shineText 2.7s ease-in-out both; margin:1rem 0; letter-spacing: 2px;}
+@keyframes shineText {0% {opacity:0;filter: blur(10px);}60% {opacity:1;filter:blur(0px);}85% {color:#fffbe7;}100% {color:#ffe666;}}
 .confetti { position:fixed; pointer-events:none; left:0; top:0; width:100vw; height:100vh; overflow:hidden; z-index:200; }
 .confetti-piece { position:absolute;width:18px; height:18px; border-radius:40%; opacity:0.78; animation:confetti-fall 2.7s linear forwards;}
 @keyframes confetti-fall {0% {opacity:0; transform:translateY(-44px);}20% {opacity:0.8;}100% {opacity:1; transform:translateY(96vh);}}
-/* Slideshow */
-.slideshow-container {
-    position: relative;
-    max-width: 340px;
-    margin: 2rem auto 3rem auto;
-    min-height: 370px;
-    background: #18181a;
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 6px 28px 0 #5177df2c;
-}
-.slide {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 370px;
-    transition: opacity 0.6s;
-    opacity: 0;
-}
-.slide img {
-    max-width: 270px;
-    height: 320px;
-    border-radius: 20px;
-    object-fit: cover;
-    box-shadow: 0 6px 24px 0 #5177df44;
-    border: 4px solid #ffe666;
-}
-.slide.show {
-    display: flex;
-    opacity: 1;
-    animation: revealPhoto 1.2s;
-}
-@keyframes revealPhoto {
-    0% { opacity: 0; transform: scale(0.92);}
-    75% { opacity: 0.9; transform: scale(1.04);}
-    100% { opacity: 1; transform: scale(1);}
-}
-.caption {
-    margin-top: 0.8em;
-    font-style: italic;
-    background: #5177df24;
-    color: #ffe666;
-    padding: 0.4em 1em;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: background 0.2s;
-}
-.music-section {
-    text-align: center;
-    margin: 2rem auto;
-    background: #232336;
-    padding:1em 0.5em;
-    border-radius: 14px;
-    box-shadow: 0 2px 14px #5177df18;
-}
-.playlist-label {
-    padding: 0.4em 1em;
-    font-weight: 600;
-    color: #ffe666;
-    margin-bottom: 0.6em;
-    background: #18181a;
-    border-radius: 12px;
-    display: inline-block;
-    font-size: 1.1em;
-}
-select {
-    font-size: 1em;
-    padding: 0.2em 1em;
-    border-radius: 10px;
-    border: 2px solid #5177df;
-    margin-bottom: 1em;
-    background:#5177dfaa;
-    color: #ffe666;
-}
-audio {
-    margin: 1em auto;
-    outline: none;
-    border-radius: 12px;
-    width: 90%;
-    background:#fffbe7;
-}
-.lovely-message {
-    font-size: 1.45em;
-    max-width:440px;
-    margin:3em auto 1em auto;
-    background: #232336;
-    color:#ffe666;
-    border-radius:18px;
-    padding:1.7em 1.2em;
-    font-family:'Pacifico',cursive;
-    letter-spacing:0.5px;
-    box-shadow:0 2px 18px #5177df1a;
-    text-shadow:0 0 8px #5177df33;
-}
+.slideshow-container { position: relative; max-width: 340px; margin: 2rem auto 3rem auto; min-height: 370px; background: #18181a; border-radius: 28px; overflow: hidden; box-shadow: 0 6px 28px 0 #5177df2c;}
+.slide { display: none; flex-direction: column; align-items: center; justify-content: center; height: 370px; transition: opacity 0.6s; opacity: 0;}
+.slide img { max-width: 270px; height: 320px; border-radius: 20px; object-fit: cover; box-shadow: 0 6px 24px 0 #5177df44; border: 4px solid #ffe666;}
+.slide.show { display: flex; opacity: 1; animation: revealPhoto 1.2s;}
+@keyframes revealPhoto {0% { opacity: 0; transform: scale(0.92);}75% { opacity: 0.9; transform: scale(1.04);}100% { opacity: 1; transform: scale(1);}}
+.caption { margin-top: 0.8em; font-style: italic; background: #5177df24; color: #ffe666; padding: 0.4em 1em; border-radius: 12px; font-size: 1rem; transition: background 0.2s;}
+.music-section { text-align: center; margin: 2rem auto; background: #232336; padding:1em 0.5em; border-radius: 14px; box-shadow: 0 2px 14px #5177df18;}
+.playlist-label { padding: 0.4em 1em; font-weight: 600; color: #ffe666; margin-bottom: 0.6em; background: #18181a; border-radius: 12px; display: inline-block; font-size: 1.1em;}
+select { font-size: 1em; padding: 0.2em 1em; border-radius: 10px; border: 2px solid #5177df; margin-bottom: 1em; background:#5177dfaa; color: #ffe666;}
+audio { margin: 1em auto; outline: none; border-radius: 12px; width: 90%; background:#fffbe7;}
+.lovely-message { font-size: 1.45em; max-width:440px; margin:3em auto 1em auto; background: #232336; color:#ffe666; border-radius:18px; padding:1.7em 1.2em; font-family:'Pacifico',cursive; letter-spacing:0.5px; box-shadow:0 2px 18px #5177df1a; text-shadow:0 0 8px #5177df33;}
 @media (max-width:650px) {
     .slideshow-container { max-width: 98vw;}
     .cake { width:88px;height:88px;}
@@ -261,7 +66,6 @@ audio {
 </style>
 </head>
 <body>
-
 <!-- Screen 1: "Hiii Saheli" -->
 <div class="screen active" id="screen1">
     <div class="bigtext">Hiii Saheli</div>
@@ -315,13 +119,7 @@ audio {
             <img src="https://drive.google.com/uc?export=view&id=1t2a5AYFoZRmHSWRIgvMEsbIxCzpFd6zv" alt="Pic 2">
             <div class="caption">You light up the world just by being you!</div>
         </div>
-        <!-- Duplicate the above slide block to add more photos up to 50+ -->
-        <!-- Example: 
-        <div class="slide">
-            <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID" alt="Pic">
-            <div class="caption">A random lovely caption!</div>
-        </div>
-        -->
+        <!-- Copy, paste and update the img src for 50+ images! -->
     </div>
     <section class="music-section">
         <div class="playlist-label">Background Music</div>
@@ -341,7 +139,7 @@ audio {
         You are my sunshine, my laughter, and my inspiration.<br>
         Every moment with you is precious, every smile is a gift.<br>
         Thank you for being you—kind, beautiful, and so deeply loved.<br>
-        Here’s to your happiest year yet. <br>
+        Here’s to your happiest year yet.<br>
         With all my love, always.
     </div>
 </div>
@@ -352,10 +150,8 @@ function nextScreen(n) {
     document.getElementById('screen'+n).classList.add('active');
     currentScreen = n;
 }
-
 function turnOnLights() {
     nextScreen(5);
-    // Create lights on top
     let strip = document.getElementById('lights-strip');
     strip.innerHTML = '';
     let colors = ['','blue','pink','green','blue','','pink'];
@@ -364,7 +160,6 @@ function turnOnLights() {
         bulb.className = 'bulb' + (c?' '+c:'');
         strip.appendChild(bulb);
     });
-    // Balloons
     let bArea = document.getElementById('balloons-area');
     bArea.innerHTML = '';
     let bcolors = ['','blue','pink',''];
@@ -377,22 +172,16 @@ function turnOnLights() {
         bArea.appendChild(balloon);
     }
 }
-
 function blowCandles() {
-    // Remove flames
     document.getElementById('flame').classList.add('off');
     document.getElementById('candle').classList.add('off');
-    // Confetti
     showConfetti();
-    // Go to slideshow after delay
     setTimeout(function(){
         nextScreen(6);
         startSlideshow();
         autoPlayMusic();
-        // After slideshow, show message
     }, 1200);
 }
-
 function showConfetti(){
     let container = document.getElementById('confetti');
     container.innerHTML = '';
@@ -407,8 +196,6 @@ function showConfetti(){
         setTimeout(()=>{piece.remove();},2200);
     }
 }
-
-// SLIDESHOW
 const randomCaptions = [
     "Your smile makes every moment magical.",
     "You light up the world just by being you!",
@@ -422,18 +209,13 @@ const randomCaptions = [
     "Dreams come true with you beside me.",
     "Starlight, laughter, and your kindness."
 ];
-
-// Add 50+ <div class="slide"> as you wish! (see above)
-
 function startSlideshow() {
-    // Fade in slideshow
     let slides = document.querySelectorAll('#slideshow .slide');
     let idx = 0;
     let showSlide = function(n){
         slides.forEach((slide,i) => {
             slide.classList.remove("show");
             if(i === n) {
-                // change caption to random
                 let cap = slide.querySelector('.caption');
                 if(cap) cap.textContent = randomCaptions[Math.floor(Math.random()*randomCaptions.length)];
                 slide.classList.add("show");
@@ -451,10 +233,8 @@ function startSlideshow() {
         }else{
             showSlide(idx);
         }
-    }, 2600); // 2.6s per pic
+    }, 2600);
 }
-
-// Background Music
 function autoPlayMusic(){ document.getElementById('audio-player').play(); }
 document.getElementById('music-select').onchange = function(){
     let ap = document.getElementById('audio-player');
