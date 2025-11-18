@@ -4,37 +4,441 @@
     <meta charset="UTF-8">
     <title>Happy Birthday Ginni Jatav!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts for elegant look -->
+    <!-- Elegant fonts -->
     <link href="https://fonts.googleapis.com/css?family=Pacifico|Montserrat:400,700" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(to right, #ffde59 0%, #5177df 100%);
+            background: linear-gradient(120deg, #ffde59 0%, #5177df 100%);
             min-height: 100vh;
             margin: 0;
-            padding: 0;
             font-family: 'Montserrat', sans-serif;
             color: #364f6b;
         }
-        header {
-            text-align: center;
-            padding: 2rem 0 1rem 0;
-        }
+        header { text-align: center; padding: 2rem 1rem 1rem 1rem; }
         h1 {
             font-family: 'Pacifico', cursive;
             font-size: 3rem;
             color: #f7b801;
-            text-shadow: 2px 2px 8px #4177df77;
+            text-shadow: 2px 2px 12px #5177df66;
             margin-bottom: 0.5rem;
             animation: fadeInDown 2s;
         }
         h2 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #5177df;
             margin-bottom: 1rem;
             animation: fadeIn 3s;
         }
-        .gallery {
+        .countdown {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: #fffbe7e8;
+            color: #5177df;
+            border-radius: 14px;
+            display: inline-block;
+            padding: 0.8em 1.2em;
+            box-shadow: 0 4px 16px #364f6b22;
+            animation: fadeInUp 1.6s;
+        }
+        /* Photo Slideshow */
+        .slideshow-container {
+            position: relative;
+            max-width: 340px;
+            margin: 2rem auto 3rem auto;
+            min-height: 370px;
+            background: #fffdedc2;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 6px 28px 0 #5177df2c;
+        }
+        .slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 370px;
+            transition: opacity 0.6s;
+            opacity: 0;
+        }
+        .slide img {
+            max-width: 270px;
+            height: 320px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 6px 24px 0 #5177df44;
+            border: 4px solid #ffe666;
+        }
+        .slide.show {
             display: flex;
+            opacity: 1;
+            animation: revealPhoto 1.8s;
+        }
+        @keyframes revealPhoto {
+            0% { opacity: 0; transform: scale(0.92);}
+            75% { opacity: 0.9; transform: scale(1.04);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+        .caption {
+            margin-top: 0.8em;
+            font-style: italic;
+            background: #5177df14;
+            color: #364f6b;
+            padding: 0.4em 1em;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        /* Slideshow controls */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 49%;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            margin-top: -22px;
+            color: #fff;
+            background: #5177dfcc;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.8em;
+            font-weight: bold;
+            transition: background 0.2s;
+            box-shadow: 0 2px 10px #ffde5965;
+            z-index: 2;
+        }
+        .next { right: 16px; }
+        .prev { left: 16px; }
+        .prev:hover, .next:hover { background: #f7b801d6; color: #5177df;}
+        /* Loving Quotes */
+        .quotes {
+            background: rgba(255,255,255,0.76);
+            border-radius: 17px;
+            margin: 2rem auto;
+            max-width: 650px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 24px 0 #5177df24;
+            animation: fadeInUp 2.1s;
+        }
+        .quote {
+            font-size: 1.18rem;
+            font-style: italic;
+            margin: 1.1rem 0;
+            color: #364f6b;
+            transition: color 0.3s;
+        }
+        .quote:hover {
+            color: #5177df;
+            text-shadow: 0 0 8px #ffe6667b;
+        }
+        /* Timeline */
+        .timeline-section {
+            margin: 3rem auto 3rem auto;
+            max-width: 520px;
+        }
+        .timeline-header {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 1em;
+            color: #5177df;
+            font-weight: bold;
+        }
+        .timeline {
+            position: relative;
+            padding: 1.5em 0;
+            margin-top: 1em;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 35px;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(120deg, #f7b801 30%, #5177df 99%);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.2em;
+            padding-left: 64px;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-dot {
+            position: absolute;
+            left: 24px;
+            top: 5px;
+            width: 22px;
+            height: 22px;
+            background: #ffe666;
+            border: 4px solid #5177df;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px #5177df4a;
+        }
+        .timeline-date {
+            font-size: 0.82em;
+            color: #5177df;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .timeline-desc {
+            margin-top: 0.7em;
+            font-size: 1.05em;
+            color: #364f6b;
+        }
+        /* Playlist */
+        .music-section {
+            text-align: center;
+            margin: 2rem auto;
+        }
+        .playlist-label {
+            padding: 0.4em 1em;
+            font-weight: 600;
+            color: #364f6b;
+            margin-bottom: 0.8em;
+            background: #ffe66677;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        select {
+            font-size: 1em;
+            padding: 0.2em 1em;
+            border-radius: 10px;
+            border: 2px solid #5177df;
+            margin-bottom: 1em;
+        }
+        audio {
+            margin: 1em auto;
+            outline: none;
+            border-radius: 12px;
+        }
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            overflow: hidden;
+            z-index: 99;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 18px; height: 18px;
+            border-radius: 40%;
+            opacity: 0.62;
+            animation: confetti-fall 2.2s linear forwards;
+        }
+        @keyframes confetti-fall {
+            0% {opacity:0; transform:translateY(-44px);}
+            20% {opacity:0.8;}
+            100% {opacity:1; transform:translateY(96vh);}
+        }
+        @keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+        @keyframes fadeInDown {0% {opacity:0; transform:translateY(-60px);} 100% {opacity:1; transform:translateY(0);}}
+        @keyframes fadeInUp {0% {opacity:0; transform:translateY(40px);} 100% {opacity:1; transform:translateY(0);}}
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            font-size: 1em;
+            color: #5177df;
+            font-weight: 600;
+        }
+        @media (max-width:650px) {
+            .slideshow-container, .timeline-section { max-width: 96vw;}
+        }
+    </style>
+</head>
+<body>
+    <div class="confetti"></div>
+    <header>
+      <h1>Happy Birthday Ginni Jatav!</h1>
+      <h2>With all my love, joy, and lots of smiles on your special day</h2>
+      <div class="countdown" id="countdown"></div>
+    </header>
+
+    <!-- Slideshow -->
+    <section class="slideshow-container" id="slideshow">
+        <button class="prev" title="Previous Photo">&#10094;</button>
+        <button class="next" title="Next Photo">&#10095;</button>
+        <!-- PHOTO SLIDES: Replace src with your Drive image links below! -->
+        <div class="slide show">
+            <img src="https://drive.google.com/uc?export=view&id=130azzPxCbxwlobGSWd67Fq0eJVc0_ryH" alt="Birthday Pic">
+            <div class="caption">Your smile brightens every day!</div>
+        </div>
+        <div class="slide">
+            <img src="https://drive.google.com/uc?export=view&id=1t2a5AYFoZRmHSWRIgvMEsbIxCzpFd6zv" alt="Birthday Pic">
+            <div class="caption">You are the sunshine in my world.</div>
+        </div>
+        <div class="slide">
+            <img src="https://drive.google.com/uc?export=view&id=15MZ9XKQsV3G6D4LocDHQKMBmsG_y302h" alt="Birthday Pic">
+            <div class="caption">You make life magical just by being you.</div>
+        </div>
+        <div class="slide">
+            <img src="https://drive.google.com/uc?export=view&id=1iAUdkR48pvtDhuVej7e_0vZn23bW9iMI" alt="Birthday Pic">
+            <div class="caption">Every moment with you is precious.</div>
+        </div>
+    </section>
+
+    <!-- Loving Birthday Messages -->
+    <section class="quotes">
+        <div class="quote">“Happy Birthday Ginni! You fill my life with sunshine and love. May your day be as radiant as you are.”</div>
+        <div class="quote">“Every moment with you is a beautiful melody. Wishing you a birthday full of happiness and sweet surprises.”</div>
+        <div class="quote">“To the girl who colours my world blue and brightens my every day in yellow—Happy Birthday, Ginni!”</div>
+        <div class="quote">“No words can capture how wonderful you are, but today I hope my wishes come close.”</div>
+        <div class="quote">“Here’s to another year of laughter, love, and unforgettable moments with you.”</div>
+    </section>
+    
+    <!-- Timeline of Memorable Events -->
+    <section class="timeline-section">
+        <div class="timeline-header">Our Timeline of Memories</div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">July 2023</div>
+                <div class="timeline-desc">The day we met – when everything changed!</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">September 2023</div>
+                <div class="timeline-desc">Our first adventure together – endless laughter.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">December 2023</div>
+                <div class="timeline-desc">Shared our first heartfelt wishes & New Year dreams.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">April 2024</div>
+              <div class="timeline-desc">A magical surprise just for you.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">June 2024</div>
+                <div class="timeline-desc">Discovering new places, loving every moment with you.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">November 2024</div>
+                <div class="timeline-desc">Celebrating what makes you special – always!</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Today</div>
+                <div class="timeline-desc"><b>Celebrating your birthday and our beautiful story together!</b></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Music Playlist Section -->
+    <section class="music-section">
+        <div class="playlist-label">Romantic Playlist</div>
+        <select id="music-select">
+            <option value="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3">
+              Beautiful Instrumental
+            </option>
+            <option value="https://cdn.pixabay.com/audio/2023/02/07/audio_12fa2b387e.mp3">
+              Happy Romantic Vibes
+            </option>
+            <option value="https://cdn.pixabay.com/audio/2023/08/11/audio_14050d4f7b.mp3">
+              Love & Soul
+            </option>
+        </select>
+        <audio id="audio-player" controls autoplay loop>
+            <source src="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3" type="audio/mp3">
+        </audio>
+    </section>
+    <footer>
+        Made with 💛💙 for Ginni Jatav<br>
+        <span style="font-size:0.9em">Designed by <b>svnig7</b> — 2025</span>
+    </footer>
+    <!-- SCRIPTS -->
+    <script>
+    // --- COUNTDOWN TIMER ---
+    function birthdayCountdown(){
+        const countdown = document.getElementById("countdown");
+        const now = new Date();
+        // Next birthday: Dec 16, 2025 (if today is after, use next year)
+        let year = now.getMonth() > 11 || (now.getMonth() === 11 && now.getDate() > 16) ? now.getFullYear()+1 : now.getFullYear();
+        let birthday = new Date(year, 11, 16); // Months 0-indexed so Dec = 11
+        let diff = birthday - now;
+        if(diff < 0) diff += 365*24*60*60*1000;
+        let d = Math.floor(diff / (1000*60*60*24)), h = Math.floor((diff%(1000*60*60*24))/(1000*60*60)), m = Math.floor((diff%(1000*60*60))/(1000*60)), s = Math.floor((diff%(1000*60))/1000);
+        countdown.innerHTML = `<span>${d} days</span> <span>${h} hrs</span> <span>${m} mins</span> <span>${s} secs</span> until your birthday!`;
+        setTimeout(birthdayCountdown, 1000);
+    }
+    birthdayCountdown();
+
+    // --- SLIDESHOW & RANDOM CAPTION ---
+    const randomCaptions = [
+        "Your smile brightens every day!",
+        "You are the sunshine in my world.",
+        "You make life magical just by being you.",
+        "Every moment with you is precious.",
+        "You’re my favorite happiness.",
+        "Smiles are sweeter with you.",
+        "Coloring my world, simply by being in it.",
+        "Love grows deeper every day with you."
+    ];
+    // You can add your image links - update below with your own from Drive!
+    // Replace image src links as needed
+    const slides = document.querySelectorAll(".slide");
+    let slideIdx = 0;
+    function showSlide(n) {
+        slides.forEach((slide,i) => {
+            slide.classList.remove("show");
+            if(i === n) {
+                // change caption to random
+                slide.querySelector('.caption').textContent = randomCaptions[Math.floor(Math.random()*randomCaptions.length)];
+                slide.classList.add("show");
+            }
+        });
+    }
+    function nextSlide() {
+        slideIdx = (slideIdx+1)%slides.length;
+        showSlide(slideIdx);
+        confettiBurst();
+    }
+    function prevSlide() {
+        slideIdx = (slideIdx-1+slides.length)%slides.length;
+        showSlide(slideIdx);
+        confettiBurst();
+    }
+    document.querySelector(".next").onclick = nextSlide;
+    document.querySelector(".prev").onclick = prevSlide;
+
+    // Initial show (and randomize captions)
+    showSlide(slideIdx);
+
+    // --- CONFETTI BURST ---
+    function confettiBurst(){
+        let container = document.querySelector('.confetti');
+        for(let i=0;i<24;i++){
+            let piece = document.createElement('div');
+            piece.classList.add('confetti-piece');
+            piece.style.background = ["#f7b801","#5177df","pink","gold"][Math.floor(Math.random()*4)];
+            piece.style.left = Math.random()*100 + "vw";
+            piece.style.animationDuration = (1.5+Math.random()*0.8)+'s';
+            piece.style.borderRadius = Math.random()<0.5?'50%':'40%';
+            piece.style.zIndex = 99;
+            container.appendChild(piece);
+            setTimeout(()=>{piece.remove();},2200);
+        }
+    }
+    // Popup confetti every time a new slide is shown
+    // (Also on page load for fun)
+    setTimeout(confettiBurst,2000);
+
+    // --- MUSIC SELECTOR ---
+    const audioPlayer = document.getElementById('audio-player');
+    document.getElementById('music-select').onchange = function(){
+        audioPlayer.src = this.value;
+        audioPlayer.play();
+    };
+
+    </script>
+</body>
+</html>            display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 2rem;
