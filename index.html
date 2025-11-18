@@ -1,0 +1,364 @@
+<!--
+Birthday Photo Mix - Single-file HTML
+Features:
+ - Drag & drop or file input to upload photos (multiple)
+ - Responsive masonry-style gallery
+ - Click any photo to open full-screen slideshow (with next/prev/autoplay)
+ - Select photos (click toggle) and press "Create Collage" to generate a downloadable collage
+ - Download collage as PNG
+
+How to use:
+ 1. Open this file in a modern browser (double-click the file or serve it).
+ 2. Drag images onto the gray upload area or click "Choose files".
+ 3. Click thumbnails to view slideshow. Use arrow keys for navigation.
+ 4. Click thumbnails to select for collage (selected photos get a white border). Press "Create Collage".
+
+No external libraries required.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Birthday Photo Mix</title>
+  <style>
+    :root{--accent:#ff6b6b;--bg:#0f1720;--card:#0b1220}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial; margin:0; background:linear-gradient(180deg,#07101a 0%, #071f2b 100%); color:#e6eef6; min-height:100vh}
+    .wrap{max-width:1100px;margin:28px auto;padding:18px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:20px}
+    .uploader{border:2px dashed rgba(255,255,255,0.08); padding:18px;border-radius:12px; background:rgba(255,255,255,0.02); display:flex;gap:12px;align-items:center}
+    .drop{flex:1;padding:18px;border-radius:8px;text-align:center;color:rgba(230,238,246,0.8)}
+    .drop.drag{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04));border-color:var(--accent)}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+
+    /* gallery */
+    .controls{display:flex;gap:8px;margin-top:12px;align-items:center}
+    .gallery{margin-top:18px;column-count:3;column-gap:12px}
+    @media(max-width:900px){.gallery{column-count:2}}
+    @media(max-width:600px){.gallery{column-count:1}}
+    .thumb{break-inside:avoid;margin-bottom:12px;position:relative;cursor:pointer;overflow:hidden;border-radius:10px}
+    .thumb img{width:100%;height:auto;display:block;transition:transform .25s ease}
+    .thumb:hover img{transform:scale(1.03)}
+    .select-mark{position:absolute;right:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px;border-radius:8px;border:2px solid rgba(255,255,255,0.06)}
+    .thumb.selected{outline:4px solid rgba(255,255,255,0.07)}
+
+    /* slideshow modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal.show{display:flex}
+    .slide{max-width:90%;max-height:90%;position:relative}
+    .slide img{max-width:100%;max-height:100%;display:block;border-radius:10px}
+    .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;color:#fff;cursor:pointer}
+    .nav.left{left:-60px}
+    .nav.right{right:-60px}
+    .close{position:absolute;right:12px;top:12px;font-size:20px;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;cursor:pointer}
+
+    /* collage area */
+    .collage-area{margin-top:18px;display:flex;gap:12px;align-items:center}
+    .collage-canvas{background:#fff;border-radius:8px;overflow:hidden}
+    .small{font-size:13px;color:rgba(230,238,246,0.7)}
+
+    footer{margin-top:28px;color:rgba(230,238,246,0.6);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Birthday Photo Mix — Gallery · Slideshow · Collage</h1>
+        <div class="small">Drag & drop photos or click to pick. Works offline (single file).</div>
+      </div>
+      <div>
+        <button id="autoplayToggle" class="btn" title="Toggle autoplay">Start Slideshow</button>
+      </div>
+    </header>
+
+    <!-- Add images by URL -->
+    <section style="margin-top:16px">
+      <div class="uploader" style="flex-direction:column;align-items:stretch">
+        <label class="small" style="margin-bottom:6px">Add photo by direct link (URL)</label>
+        <input id="urlInput" type="text" placeholder="Paste image link here (jpg, png, etc.)" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%;margin-bottom:8px">
+        <button id="addUrlBtn" class="btn">Add Image URL</button>
+      </div>
+    </section>
+
+    <section style="margin-top:12px">
+      <div class="uploader" id="uploader">
+        <div class="drop" id="drop">Drop photos here or click to select<br><small class="small">PNG, JPG, HEIC (if browser supports), GIF (first frame used)</small></div>
+        <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button id="chooseBtn" class="btn">Choose files</button>
+          <button id="clearBtn" class="btn" style="background:#2b2f36">Clear all</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="createCollage" class="btn">Create Collage from selected</button>
+        <button id="downloadCollage" class="btn" style="background:#2b2f36">Download Collage</button>
+        <div class="small" style="margin-left:auto">Click thumbnails to view slideshow. Click again to select for collage.</div>
+      </div>
+
+      <div id="gallery" class="gallery"></div>
+
+      <div class="collage-area">
+        <canvas id="collageCanvas" class="collage-canvas" width="900" height="600"></canvas>
+        <div style="min-width:220px">
+          <div class="small">Collage options</div>
+          <label class="small">Canvas size: <select id="canvasSize"><option value="900x600">900×600</option><option value="1200x800">1200×800</option><option value="1600x900">1600×900</option></select></label>
+          <div style="margin-top:8px">
+            <label class="small">Layout: <select id="layout"><option value="grid">Grid</option><option value="random">Random scatter</option><option value="mosaic">Mosaic</option></select></label>
+          </div>
+          <div style="margin-top:12px">
+            <button id="regen" class="btn">Regenerate</button>
+            <button id="shuffle" class="btn" style="background:#2b2f36">Shuffle</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div id="slideshowModal" class="modal" tabindex="-1">
+      <div class="slide" role="dialog">
+        <div class="close" id="closeModal">✕</div>
+        <div class="nav left" id="prev">‹</div>
+        <img id="slideImg" src="" alt="">
+        <div class="nav right" id="next">›</div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Made with ❤️ — Save the file locally to use offline. Works best in latest Chrome/Edge/Firefox/Safari.</div>
+    </footer>
+  </div>
+
+<script>
+(function(){
+  const uploader = document.getElementById('uploader');
+  const drop = document.getElementById('drop');
+  const chooseBtn = document.getElementById('chooseBtn');
+  const fileInput = document.getElementById('fileInput');
+  const gallery = document.getElementById('gallery');
+  const createCollageBtn = document.getElementById('createCollage');
+  const regenBtn = document.getElementById('regen');
+  const shuffleBtn = document.getElementById('shuffle');
+  const downloadCollageBtn = document.getElementById('downloadCollage');
+  const canvas = document.getElementById('collageCanvas');
+  const ctx = canvas.getContext('2d');
+  const canvasSize = document.getElementById('canvasSize');
+  const layoutSel = document.getElementById('layout');
+
+  const modal = document.getElementById('slideshowModal');
+  const slideImg = document.getElementById('slideImg');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const closeModal = document.getElementById('closeModal');
+  const autoplayToggle = document.getElementById('autoplayToggle');
+
+  let images = []; // {file, url, img, selected}
+  let currentIndex = 0;
+  let autoplay = false;
+  let autoplayTimer = null;
+
+  function addFiles(files){
+    for(const f of files){
+      if(!f.type.startsWith('image/')) continue;
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.src = url;
+      img.onload = ()=>{ /* nothing */ };
+      images.push({file:f,url,img,selected:false});
+      makeThumb(images.length-1);
+    }
+  }
+
+  function makeThumb(i){
+    const item = images[i];
+    const div = document.createElement('div');
+    div.className='thumb';
+    div.dataset.index = i;
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = item.file.name || ('photo-'+i);
+    div.appendChild(img);
+    const mark = document.createElement('div');
+    mark.className='select-mark';
+    mark.textContent='♡';
+    div.appendChild(mark);
+    gallery.prepend(div);
+
+    div.addEventListener('click', (e)=>{
+      // toggle selection if ctrl/meta pressed; otherwise open slideshow
+      if(e.shiftKey || e.ctrlKey || e.metaKey){
+        toggleSelect(i,div);
+      } else {
+        openSlideshow(i);
+      }
+    });
+    // also support long-press to select on mobile (simple implementation)
+    let pressTimer=null;
+    div.addEventListener('touchstart', ()=>{ pressTimer=setTimeout(()=>toggleSelect(i,div),500) });
+    div.addEventListener('touchend', ()=>{ clearTimeout(pressTimer) });
+  }
+
+  function toggleSelect(i,div){
+    images[i].selected = !images[i].selected;
+    if(images[i].selected){ div.classList.add('selected'); div.querySelector('.select-mark').textContent='✔' }
+    else { div.classList.remove('selected'); div.querySelector('.select-mark').textContent='♡' }
+  }
+
+  // Add image by URL
+  const urlInput=document.getElementById('urlInput');
+  const addUrlBtn=document.getElementById('addUrlBtn');
+  addUrlBtn?.addEventListener('click',()=>{
+    const link=urlInput.value.trim(); if(!link) return;
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      images.push({file:{name:link},url:link,img,selected:false});
+      makeThumb(images.length-1);
+    };
+    img.onerror=()=>alert('Could not load image from URL');
+    img.src=link;
+    urlInput.value='';
+  });
+
+  // Drag & drop
+  ['dragenter','dragover'].forEach(ev=>{
+    uploader.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.add('drag') })
+  });
+  ['dragleave','drop'].forEach(ev=>{
+    uploader.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); if(ev==='drop'){ drop.classList.remove('drag'); addFiles(e.dataTransfer.files) } else drop.classList.remove('drag') })
+  });
+
+  chooseBtn.addEventListener('click', ()=>fileInput.click());
+  fileInput.addEventListener('change', (e)=>addFiles(e.target.files));
+
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    images.forEach(it=>URL.revokeObjectURL(it.url)); images=[]; gallery.innerHTML=''; ctx.clearRect(0,0,canvas.width,canvas.height);
+  });
+
+  // Slideshow
+  function openSlideshow(i){
+    if(!images[i]) return; currentIndex=i; slideImg.src=images[i].url; modal.classList.add('show'); modal.focus();
+    if(autoplay) startAutoplay();
+  }
+  function closeSlideshow(){ modal.classList.remove('show'); stopAutoplay(); }
+  prevBtn.addEventListener('click', ()=>{ navigate(-1) });
+  nextBtn.addEventListener('click', ()=>{ navigate(1) });
+  closeModal.addEventListener('click', closeSlideshow);
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeSlideshow(); });
+  document.addEventListener('keydown', (e)=>{
+    if(modal.classList.contains('show')){
+      if(e.key=== 'ArrowRight') navigate(1);
+      if(e.key=== 'ArrowLeft') navigate(-1);
+      if(e.key==='Escape') closeSlideshow();
+    }
+  });
+
+  function navigate(delta){
+    if(images.length===0) return;
+    currentIndex = (currentIndex + delta + images.length) % images.length;
+    slideImg.src = images[currentIndex].url;
+  }
+
+  // autoplay
+  autoplayToggle.addEventListener('click', ()=>{
+    autoplay = !autoplay; autoplayToggle.textContent = autoplay ? 'Stop Slideshow' : 'Start Slideshow';
+    if(autoplay && modal.classList.contains('show')) startAutoplay(); else stopAutoplay();
+  });
+  function startAutoplay(){ stopAutoplay(); autoplayTimer = setInterval(()=>navigate(1), 2500); }
+  function stopAutoplay(){ if(autoplayTimer) clearInterval(autoplayTimer); autoplayTimer=null; }
+
+  // Collage generation
+  function getSelected(){ return images.filter(it=>it.selected).map(it=>it.img); }
+
+  function setCanvasSizeFromSelect(){ const [w,h] = canvasSize.value.split('x').map(Number); canvas.width=w; canvas.height=h; }
+
+  function createCollage(){
+    const imgs = getSelected(); if(imgs.length===0){ alert('No photos selected for collage. Click thumbnails while holding CTRL (or long-press on mobile) to select.'); return; }
+    setCanvasSizeFromSelect(); ctx.clearRect(0,0,canvas.width,canvas.height);
+    const layout = layoutSel.value;
+    if(layout==='grid') drawGrid(imgs);
+    else if(layout==='random') drawRandom(imgs);
+    else drawMosaic(imgs);
+  }
+
+  function drawGrid(imgs){
+    const cols = Math.ceil(Math.sqrt(imgs.length));
+    const rows = Math.ceil(imgs.length/cols);
+    const w = canvas.width/cols; const h = canvas.height/rows;
+    imgs.forEach((im,i)=>{
+      const col = i % cols; const row = Math.floor(i/cols);
+      const dw = w; const dh = h;
+      const [sx,sy,sw,sh] = fitImage(im.width,im.height,dw,dh);
+      ctx.drawImage(im, sx, sy, sw, sh, Math.round(col*w), Math.round(row*h), Math.round(dw), Math.round(dh));
+      // soft border
+      ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=6; ctx.strokeRect(Math.round(col*w), Math.round(row*h), Math.round(dw), Math.round(dh));
+    });
+  }
+
+  function drawRandom(imgs){
+    imgs.forEach((im,i)=>{
+      const scale = 0.35 + Math.random()*0.6; const dw = canvas.width*scale; const dh = dw * (im.height/im.width);
+      const x = Math.random()*(canvas.width-dw); const y = Math.random()*(canvas.height-dh);
+      const [sx,sy,sw,sh] = fitImage(im.width,im.height,dw,dh);
+      ctx.globalAlpha = 0.95; ctx.drawImage(im, sx, sy, sw, sh, Math.round(x), Math.round(y), Math.round(dw), Math.round(dh));
+      ctx.globalAlpha = 1;
+    });
+    // light overlay
+    ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+
+  function drawMosaic(imgs){
+    // create rows of varying heights
+    let y=0; let idx=0;
+    while(y<canvas.height && idx<imgs.length){
+      const rowHeight = canvas.height * (0.15 + Math.random()*0.25);
+      let x=0; while(x<canvas.width && idx<imgs.length){
+        const im = imgs[idx++]; const aspect=im.width/im.height; const w = rowHeight * aspect; const h = rowHeight;
+        if(x + w > canvas.width){ // scale down to fit
+          const scale = (canvas.width - x)/w; w *= scale; h *= scale;
+        }
+        const [sx,sy,sw,sh] = fitImage(im.width,im.height,w,h);
+        ctx.drawImage(im, sx, sy, sw, sh, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        x += w;
+      }
+      y += rowHeight;
+    }
+  }
+
+  function fitImage(iw,ih,dw,dh){
+    // crops to fill destination (cover)
+    const r = Math.max(dw/iw, dh/ih);
+    const sw = Math.round(dw/r); const sh = Math.round(dh/r);
+    const sx = Math.max(0, Math.round((iw - sw)/2)); const sy = Math.max(0, Math.round((ih - sh)/2));
+    return [sx,sy,sw,sh];
+  }
+
+  createCollageBtn.addEventListener('click', createCollage);
+  regenBtn.addEventListener('click', createCollage);
+  shuffleBtn.addEventListener('click', ()=>{ shuffleSelected(); createCollage(); });
+
+  function shuffleSelected(){ const sel = images.filter(it=>it.selected); for(let i=sel.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [sel[i],sel[j]]=[sel[j],sel[i]] } // but need to reorder images array preserving others
+    // place shuffled back in same indices as selected ones
+    let sidx=0; for(let k=0;k<images.length;k++){ if(images[k].selected) images[k]=sel[sidx++]; }
+  }
+
+  downloadCollageBtn.addEventListener('click', ()=>{
+    const link = document.createElement('a'); link.download='collage.png'; link.href = canvas.toDataURL('image/png'); link.click();
+  });
+
+  // keyboard shortcuts for convenience
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='c' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); createCollage(); }
+  });
+
+  // helper: when images array updates (after load) populate thumbnails selected state
+  // also expose an example starter: if user drops no images, we can fill with placeholders? we'll keep empty by default.
+
+})();
+</script>
+</body>
+</html>
