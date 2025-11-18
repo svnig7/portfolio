@@ -1,754 +1,168 @@
-<!--
-Birthday Photo Mix - Single-file HTML
-Features:
- - Drag & drop or file input to upload photos (multiple)
- - Responsive masonry-style gallery
- - Click any photo to open full-screen slideshow (with next/prev/autoplay)
- - Select photos (click toggle) and press "Create Collage" to generate a downloadable collage
- - Download collage as PNG
-
-How to use:
- 1. Open this file in a modern browser (double-click the file or serve it).
- 2. Drag images onto the gray upload area or click "Choose files".
- 3. Click thumbnails to view slideshow. Use arrow keys for navigation.
- 4. Click thumbnails to select for collage (selected photos get a white border). Press "Create Collage".
-
-No external libraries required.
---><!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Birthday Photo Mix</title>
-  <style>
-    :root{--accent:#ff6b6b;--bg:#0f1720;--card:#0b1220}
-    *{box-sizing:border-box}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial; margin:0; background:linear-gradient(180deg,#07101a 0%, #071f2b 100%); color:#e6eef6; min-height:100vh}
-    .wrap{max-width:1100px;margin:28px auto;padding:18px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between}
-    h1{margin:0;font-size:20px}
-    .uploader{border:2px dashed rgba(255,255,255,0.08); padding:18px;border-radius:12px; background:rgba(255,255,255,0.02); display:flex;gap:12px;align-items:center}
-    .drop{flex:1;padding:18px;border-radius:8px;text-align:center;color:rgba(230,238,246,0.8)}
-    .drop.drag{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04));border-color:var(--accent)}
-    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}/* gallery */
-.controls{display:flex;gap:8px;margin-top:12px;align-items:center}
-.gallery{margin-top:18px;column-count:3;column-gap:12px}
-@media(max-width:900px){.gallery{column-count:2}}
-@media(max-width:600px){.gallery{column-count:1}}
-.thumb{break-inside:avoid;margin-bottom:12px;position:relative;cursor:pointer;overflow:hidden;border-radius:10px}
-.thumb img{width:100%;height:auto;display:block;transition:transform .25s ease}
-.thumb:hover img{transform:scale(1.03)}
-.select-mark{position:absolute;right:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px;border-radius:8px;border:2px solid rgba(255,255,255,0.06)}
-.thumb.selected{outline:4px solid rgba(255,255,255,0.07)}
-
-/* slideshow modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:50}
-.modal.show{display:flex}
-.slide{max-width:90%;max-height:90%;position:relative}
-.slide img{max-width:100%;max-height:100%;display:block;border-radius:10px}
-.nav{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;color:#fff;cursor:pointer}
-.nav.left{left:-60px}
-.nav.right{right:-60px}
-.close{position:absolute;right:12px;top:12px;font-size:20px;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;cursor:pointer}
-
-/* collage area */
-.collage-area{margin-top:18px;display:flex;gap:12px;align-items:center}
-.collage-canvas{background:#fff;border-radius:8px;overflow:hidden}
-.small{font-size:13px;color:rgba(230,238,246,0.7)}
-
-footer{margin-top:28px;color:rgba(230,238,246,0.6);font-size:13px}
-
-  </style>
-  <style>
-    /* PRO WEBSITE STYLING UPGRADE */
-    body{
-      background: radial-gradient(circle at top, #0d1b3d 0%, #050915 100%);
-      font-family: 'Poppins', sans-serif;
-      color:#e8ecf3;
-      overflow-x:hidden;
-    }
-    .landing{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      text-align:center;
-      background:linear-gradient(135deg,#0a1228 0%,#162447 100%);
-      animation:fadeIn 1.5s ease;
-    }
-    .landing h1{
-      font-size:3rem;
-      font-weight:700;
-      background:linear-gradient(90deg,#ff6ec4,#7873f5,#4ade80);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      animation:glow 3s ease-in-out infinite;
-    }
-    @keyframes glow{
-      0%{filter:drop-shadow(0 0 4px #ff6ec4);} 
-      50%{filter:drop-shadow(0 0 12px #7873f5);} 
-      100%{filter:drop-shadow(0 0 4px #ff6ec4);} 
-    }
-    .btn{
-      padding:12px 24px;
-      border-radius:12px;
-      font-size:1rem;
-      font-weight:600;
-      cursor:pointer;
-      background:linear-gradient(90deg,#6a5af9,#4bc6ff);
-      border:none;
-      color:white;
-      transition:0.25s;
-    }
-    .btn:hover{
-      transform:translateY(-3px);
-      box-shadow:0 6px 18px rgba(0,0,0,0.4);
-    }
-    .gallery{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:16px;
-      padding:20px;
-    }
-    .gallery img{
-      width:100%;
-      height:220px;
-      object-fit:cover;
-      border-radius:16px;
-      transition:0.35s;
-      box-shadow:0 4px 20px rgba(0,0,0,0.4);
-    }
-    .gallery img:hover{
-      transform:scale(1.05);
-      box-shadow:0 6px 30px rgba(0,0,0,0.55);
-    }
-    #quoteBox{
-      position:absolute;
-      bottom:40px;
-      left:50%;
-      transform:translateX(-50%);
-      font-size:1.2rem;
-      opacity:0;
-      background:rgba(0,0,0,0.45);
-      padding:12px 20px;
-      border-radius:12px;
-      backdrop-filter:blur(6px);
-      transition:opacity .6s;
-    }
-    #quoteBox.show{opacity:1;}
-    .heartFloat{
-      position:fixed;
-      bottom:-30px;
-      width:24px;
-      height:24px;
-      background:url('https://cdn-icons-png.flaticon.com/512/833/833472.png') no-repeat center/contain;
-      animation:floatUp 4s ease-in infinite;
-    }
-    @keyframes floatUp{
-      0%{transform:translateY(0) scale(0.6);opacity:0.3;}
-      50%{opacity:1;}
-      100%{transform:translateY(-120vh) scale(1);opacity:0;}
-    }
-  </style>
-</head>
-<body>  <!-- Landing Page / Start Screen -->  <div id="landing" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0f1a,#14202e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;color:#fff;padding:20px">
-    <h1 style="font-size:32px;margin-bottom:10px">🎉 Happy Birthday Surprise 🎉</h1>
-    <h2 id="landingName" style="font-size:22px;margin-bottom:25px">Tap to Begin</h2><button id="startBtn" class="btn" style="font-size:18px;padding:14px 22px">Start</button>
-
-<!-- Password box hidden until needed -->
-<div id="pwBox" style="display:none;flex-direction:column;gap:10px;margin-top:20px;width:260px">
-  <input id="pwInput" type="password" placeholder="Enter Password" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%">
-  <button id="pwSubmit" class="btn">Unlock</button>
-  <div id="pwError" style="color:#ff6b6b;font-size:14px;display:none">Wrong password</div>
-</div>
-
-  </div>  <!-- Background Music --><audio id="bgMusic" src="music.mp3" preload="auto"></audio>
-
-  <!-- Confetti Canvas --><canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:150"></canvas>
-
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Birthday Photo Mix — Gallery · Slideshow · Collage</h1>
-        <div class="small">Drag & drop photos or click to pick. Works offline (single file).</div>
-      </div>
-      <div>
-        <button id="autoplayToggle" class="btn" title="Toggle autoplay">Start Slideshow</button>
-      </div>
-    </header><!-- Add images by URL -->
-<section style="margin-top:16px">
-  <div class="uploader" style="flex-direction:column;align-items:stretch">
-    <label class="small" style="margin-bottom:6px">Add photo by direct link (URL)</label>
-    <input id="urlInput" type="text" placeholder="Paste image link here (jpg, png, etc.)" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%;margin-bottom:8px">
-    <button id="addUrlBtn" class="btn">Add Image URL</button>
-  </div>
-</section>
-
-<section style="margin-top:12px">
-  <div class="uploader" id="uploader">
-    <div class="drop" id="drop">Drop photos here or click to select<br><small class="small">PNG, JPG, HEIC (if browser supports), GIF (first frame used)</small></div>
-    <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <button id="chooseBtn" class="btn">Choose files</button>
-      <button id="clearBtn" class="btn" style="background:#2b2f36">Clear all</button>
-    </div>
-  </div>
-
-  <div class="controls">
-    <button id="createCollage" class="btn">Create Collage from selected</button>
-    <button id="downloadCollage" class="btn" style="background:#2b2f36">Download Collage</button>
-    <div class="small" style="margin-left:auto">Click thumbnails to view slideshow. Click again to select for collage.</div>
-  </div>
-
-  <div id="gallery" class="gallery"></div>
-
-  <div class="collage-area">
-    <canvas id="collageCanvas" class="collage-canvas" width="900" height="600"></canvas>
-    <div style="min-width:220px">
-      <div class="small">Collage options</div>
-      <label class="small">Canvas size: <select id="canvasSize"><option value="900x600">900×600</option><option value="1200x800">1200×800</option><option value="1600x900">1600×900</option></select></label>
-      <div style="margin-top:8px">
-        <label class="small">Layout: <select id="layout"><option value="grid">Grid</option><option value="random">Random scatter</option><option value="mosaic">Mosaic</option></select></label>
-      </div>
-      <div style="margin-top:12px">
-        <button id="regen" class="btn">Regenerate</button>
-        <button id="shuffle" class="btn" style="background:#2b2f36">Shuffle</button>
-      </div>
-    </div>
-  </div>
-
-</section>
-
-<div id="slideshowModal" class="modal" tabindex="-1">
-  <div class="slide" role="dialog">
-    <div class="close" id="closeModal">✕</div>
-    <div class="nav left" id="prev">‹</div>
-    <img id="slideImg" src="" alt="">
-    <div class="nav right" id="next">›</div>
-  </div>
-</div>
-
-<footer>
-  <div>Made with ❤️ — Save the file locally to use offline. Works best in latest Chrome/Edge/Firefox/Safari.</div>
-</footer>
-
-  </div><script>
-(function(){
-  const uploader = document.getElementById('uploader');
-  const drop = document.getElementById('drop');
-  const chooseBtn = document.getElementById('chooseBtn');
-  const fileInput = document.getElementById('fileInput');
-  const gallery = document.getElementById('gallery');
-  const createCollageBtn = document.getElementById('createCollage');
-  const regenBtn = document.getElementById('regen');
-  const shuffleBtn = document.getElementById('shuffle');
-  const downloadCollageBtn = document.getElementById('downloadCollage');
-  const canvas = document.getElementById('collageCanvas');
-  const ctx = canvas.getContext('2d');
-  const canvasSize = document.getElementById('canvasSize');
-  const layoutSel = document.getElementById('layout');
-
-  const modal = document.getElementById('slideshowModal');
-  const slideImg = document.getElementById('slideImg');
-  const prevBtn = document.getElementById('prev');
-  const nextBtn = document.getElementById('next');
-  const closeModal = document.getElementById('closeModal');
-  const autoplayToggle = document.getElementById('autoplayToggle');
-
-  let images = []; // {file, url, img, selected}
-  let currentIndex = 0;
-  let autoplay = false;
-  let autoplayTimer = null;
-
-  function addFiles(files){
-    for(const f of files){
-      if(!f.type.startsWith('image/')) continue;
-      const url = URL.createObjectURL(f);
-      const img = new Image();
-      img.src = url;
-      img.onload = ()=>{ /* nothing */ };
-      images.push({file:f,url,img,selected:false});
-      makeThumb(images.length-1);
-    }
-  }
-
-  function makeThumb(i){
-    const item = images[i];
-    const div = document.createElement('div');
-    div.className='thumb';
-    div.dataset.index = i;
-    const img = document.createElement('img');
-    img.src = item.url;
-    img.alt = item.file.name || ('photo-'+i);
-    div.appendChild(img);
-    const mark = document.createElement('div');
-    mark.className='select-mark';
-    mark.textContent='♡';
-    div.appendChild(mark);
-    gallery.prepend(div);
-
-    div.addEventListener('click', (e)=>{
-      // toggle selection if ctrl/meta pressed; otherwise open slideshow
-      if(e.shiftKey || e.ctrlKey || e.metaKey){
-        toggleSelect(i,div);
-      } else {
-        openSlideshow(i);
-      }
-    });
-    // also support long-press to select on mobile (simple implementation)
-    let pressTimer=null;
-    div.addEventListener('touchstart', ()=>{ pressTimer=setTimeout(()=>toggleSelect(i,div),500) });
-    div.addEventListener('touchend', ()=>{ clearTimeout(pressTimer) });
-  }
-
-  function toggleSelect(i,div){
-    images[i].selected = !images[i].selected;
-    if(images[i].selected){ div.classList.add('selected'); div.querySelector('.select-mark').textContent='✔' }
-    else { div.classList.remove('selected'); div.querySelector('.select-mark').textContent='♡' }
-  }
-
-  // Add image by URL
-  const urlInput=document.getElementById('urlInput');
-  const addUrlBtn=document.getElementById('addUrlBtn');
-  addUrlBtn?.addEventListener('click',()=>{
-    const link=urlInput.value.trim(); if(!link) return;
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>{
-      images.push({file:{name:link},url:link,img,selected:false});
-      makeThumb(images.length-1);
-    };
-    img.onerror=()=>alert('Could not load image from URL');
-    img.src=link;
-    urlInput.value='';
-  });
-
-  // Drag & drop
-  ['dragenter','dragover'].forEach(ev=>{
-    uploader.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.add('drag') })
-  });
-  ['dragleave','drop'].forEach(ev=>{
-    uploader.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); if(ev==='drop'){ drop.classList.remove('drag'); addFiles(e.dataTransfer.files) } else drop.classList.remove('drag') })
-  });
-
-  chooseBtn.addEventListener('click', ()=>fileInput.click());
-  fileInput.addEventListener('change', (e)=>addFiles(e.target.files));
-
-  document.getElementById('clearBtn').addEventListener('click', ()=>{
-    images.forEach(it=>URL.revokeObjectURL(it.url)); images=[]; gallery.innerHTML=''; ctx.clearRect(0,0,canvas.width,canvas.height);
-  });
-
-  // Slideshow
-  function openSlideshow(i){
-    if(!images[i]) return; currentIndex=i; slideImg.src=images[i].url; modal.classList.add('show'); modal.focus();
-    if(autoplay) startAutoplay();
-  }
-  function closeSlideshow(){ modal.classList.remove('show'); stopAutoplay(); }
-  prevBtn.addEventListener('click', ()=>{ navigate(-1) });
-  nextBtn.addEventListener('click', ()=>{ navigate(1) });
-  closeModal.addEventListener('click', closeSlideshow);
-  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeSlideshow(); });
-  document.addEventListener('keydown', (e)=>{
-    if(modal.classList.contains('show')){
-      if(e.key=== 'ArrowRight') navigate(1);
-      if(e.key=== 'ArrowLeft') navigate(-1);
-      if(e.key==='Escape') closeSlideshow();
-    }
-  });
-
-  function navigate(delta){
-    if(images.length===0) return;
-    currentIndex = (currentIndex + delta + images.length) % images.length;
-    slideImg.src = images[currentIndex].url;
-  }
-
-  // autoplay
-  autoplayToggle.addEventListener('click', ()=>{
-    autoplay = !autoplay; autoplayToggle.textContent = autoplay ? 'Stop Slideshow' : 'Start Slideshow';
-    if(autoplay && modal.classList.contains('show')) startAutoplay(); else stopAutoplay();
-  });
-  function startAutoplay(){ stopAutoplay(); autoplayTimer = setInterval(()=>navigate(1), 2500); }
-  function stopAutoplay(){ if(autoplayTimer) clearInterval(autoplayTimer); autoplayTimer=null; }
-
-  // Collage generation
-  function getSelected(){ return images.filter(it=>it.selected).map(it=>it.img); }
-
-  function setCanvasSizeFromSelect(){ const [w,h] = canvasSize.value.split('x').map(Number); canvas.width=w; canvas.height=h; }
-
-  function createCollage(){
-    const imgs = getSelected(); if(imgs.length===0){ alert('No photos selected for collage. Click thumbnails while holding CTRL (or long-press on mobile) to select.'); return; }
-    setCanvasSizeFromSelect(); ctx.clearRect(0,0,canvas.width,canvas.height);
-    const layout = layoutSel.value;
-    if(layout==='grid') drawGrid(imgs);
-    else if(layout==='random') drawRandom(imgs);
-    else drawMosaic(imgs);
-  }
-
-  function drawGrid(imgs){
-    const cols = Math.ceil(Math.sqrt(imgs.length));
-    const rows = Math.ceil(imgs.length/cols);
-    const w = canvas.width/cols; const h = canvas.height/rows;
-    imgs.forEach((im,i)=>{
-      const col = i % cols; const row = Math.floor(i/cols);
-      const dw = w; const dh = h;
-      const [sx,sy,sw,sh] = fitImage(im.width,im.height,dw,dh);
-      ctx.drawImage(im, sx, sy, sw, sh, Math.round(col*w), Math.round(row*h), Math.round(dw), Math.round(dh));
-      // soft border
-      ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=6; ctx.strokeRect(Math.round(col*w), Math.round(row*h), Math.round(dw), Math.round(dh));
-    });
-  }
-
-  function drawRandom(imgs){
-    imgs.forEach((im,i)=>{
-      const scale = 0.35 + Math.random()*0.6; const dw = canvas.width*scale; const dh = dw * (im.height/im.width);
-      const x = Math.random()*(canvas.width-dw); const y = Math.random()*(canvas.height-dh);
-      const [sx,sy,sw,sh] = fitImage(im.width,im.height,dw,dh);
-      ctx.globalAlpha = 0.95; ctx.drawImage(im, sx, sy, sw, sh, Math.round(x), Math.round(y), Math.round(dw), Math.round(dh));
-      ctx.globalAlpha = 1;
-    });
-    // light overlay
-    ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  }
-
-  function drawMosaic(imgs){
-    // create rows of varying heights
-    let y=0; let idx=0;
-    while(y<canvas.height && idx<imgs.length){
-      const rowHeight = canvas.height * (0.15 + Math.random()*0.25);
-      let x=0; while(x<canvas.width && idx<imgs.length){
-        const im = imgs[idx++]; const aspect=im.width/im.height; const w = rowHeight * aspect; const h = rowHeight;
-        if(x + w > canvas.width){ // scale down to fit
-          const scale = (canvas.width - x)/w; w *= scale; h *= scale;
+    <meta charset="UTF-8">
+    <title>Happy Birthday Ginni Jatav!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts for elegant look -->
+    <link href="https://fonts.googleapis.com/css?family=Pacifico|Montserrat:400,700" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #ffde59 0%, #5177df 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: #364f6b;
         }
-        const [sx,sy,sw,sh] = fitImage(im.width,im.height,w,h);
-        ctx.drawImage(im, sx, sy, sw, sh, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-        x += w;
-      }
-      y += rowHeight;
-    }
-  }
+        header {
+            text-align: center;
+            padding: 2rem 0 1rem 0;
+        }
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            color: #f7b801;
+            text-shadow: 2px 2px 8px #4177df77;
+            margin-bottom: 0.5rem;
+            animation: fadeInDown 2s;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #5177df;
+            margin-bottom: 1rem;
+            animation: fadeIn 3s;
+        }
+        .gallery {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .gallery img {
+            width: 260px;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px 0 #18366165;
+            transition: transform 0.5s;
+            cursor: pointer;
+            border: 4px solid #ffe666;
+        }
+        .gallery img:hover {
+            transform: scale(1.08) rotate(-2deg);
+        }
+        .quotes {
+            background: rgba(255,255,255,0.7);
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 650px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 24px 0 #5177df33;
+            animation: fadeInUp 2.5s;
+        }
+        .quote {
+            font-size: 1.25rem;
+            font-style: italic;
+            margin: 1.2rem 0;
+            color: #364f6b;
+            transition: color 0.3s;
+        }
+        .quote:hover {
+            color: #5177df;
+            text-shadow: 0 0 8px #ffe66666;
+        }
+        /* Heart Animations */
+        .hearts {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 999;
+        }
+        .heart {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/4/43/Love_Heart_SVG.svg');
+            background-size: contain;
+            opacity: 0.6;
+            animation: floatUp 8s ease-in infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.7) rotate(0deg); opacity:0; }
+            20% { opacity: 0.7;}
+            100% { transform: translateY(-140vh) scale(1.3) rotate(360deg); opacity: 0;}
+        }
+        @keyframes fadeIn {
+            0% {opacity:0;} 100% {opacity:1;}
+        }
+        @keyframes fadeInDown {
+            0% {opacity:0; transform:translateY(-60px);}
+            100% {opacity:1; transform:translateY(0);}
+        }
+        @keyframes fadeInUp {
+            0% {opacity:0; transform:translateY(40px);}
+            100% {opacity:1; transform:translateY(0);}
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1rem;
+            color: #5177df;
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts"></div>
+    <header>
+        <h1>Happy Birthday Ginni Jatav!</h1>
+        <h2>With Love, Color, and Smiles</h2>
+    </header>
 
-  function fitImage(iw,ih,dw,dh){
-    // crops to fill destination (cover)
-    const r = Math.max(dw/iw, dh/ih);
-    const sw = Math.round(dw/r); const sh = Math.round(dh/r);
-    const sx = Math.max(0, Math.round((iw - sw)/2)); const sy = Math.max(0, Math.round((ih - sh)/2));
-    return [sx,sy,sw,sh];
-  }
+    <section class="gallery">
+        <!-- Replace the src values below with your actual public image links from Google Drive -->
+        <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID_1" alt="Ginni 1">
+        <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID_2" alt="Ginni 2">
+        <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID_3" alt="Ginni 3">
+        <img src="https://drive.google.com/uc?export=view&id=YOUR_IMAGE_ID_4" alt="Ginni 4">
+    </section>
 
-  createCollageBtn.addEventListener('click', createCollage);
-  regenBtn.addEventListener('click', createCollage);
-  shuffleBtn.addEventListener('click', ()=>{ shuffleSelected(); createCollage(); });
+    <section class="quotes">
+        <div class="quote">“Happy Birthday Ginni! You fill my life with sunshine and love. May your day be as radiant as you are.”</div>
+        <div class="quote">“Every moment with you is a beautiful melody. Wishing you a birthday full of happiness and sweet surprises.”</div>
+        <div class="quote">“To the girl who colours my world blue and brightens my every day in yellow—Happy Birthday, Ginni!”</div>
+        <div class="quote">“No words can capture how wonderful you are, but today I hope my wishes come close.”</div>
+        <div class="quote">“Here’s to another year of laughter, love, and unforgettable moments with you.”</div>
+    </section>
 
-  function shuffleSelected(){ const sel = images.filter(it=>it.selected); for(let i=sel.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [sel[i],sel[j]]=[sel[j],sel[i]] } // but need to reorder images array preserving others
-    // place shuffled back in same indices as selected ones
-    let sidx=0; for(let k=0;k<images.length;k++){ if(images[k].selected) images[k]=sel[sidx++]; }
-  }
+    <!-- Music - Royalty Free Instrumental (You can replace with your own mp3 link) -->
+    <audio id="background-audio" src="https://cdn.pixabay.com/audio/2023/08/04/audio_117764b2ed.mp3" autoplay loop controls style="position:fixed;bottom:24px;right:30px;z-index:1000;background:#fffbe5;border-radius:18px;border:2px solid #5177df;"></audio>
 
-  downloadCollageBtn.addEventListener('click', ()=>{
-    const link = document.createElement('a'); link.download='collage.png'; link.href = canvas.toDataURL('image/png'); link.click();
-  });
+    <footer>
+        Made with 💛💙 for Ginni Jatav<br>
+        <span style="font-size:0.9em">Designed by <b>svnig7</b> — 2025</span>
+    </footer>
+    <script>
+        // Floating hearts animation
+        function createHearts() {
+            const heartsContainer = document.querySelector('.hearts');
+            for (let i = 0; i < 12; i++) {
+                let heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 96 + 'vw';
+                heart.style.top = Math.random() * 10 + 'vh';
+                heart.style.animationDuration = (6 + Math.random() * 5) + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+        createHearts();
 
-  // keyboard shortcuts for convenience
-  document.addEventListener('keydown', (e)=>{
-    if(e.key==='c' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); createCollage(); }
-  });
-
-  // helper: when images array updates (after load) populate thumbnails selected state
-  // also expose an example starter: if user drops no images, we can fill with placeholders? we'll keep empty by default.
-
-})();
-// Landing + Password + Music + Confetti
-(() => {
-  const landing = document.getElementById('landing');
-  const startBtn = document.getElementById('startBtn');
-  const pwBox = document.getElementById('pwBox');
-  const pwInput = document.getElementById('pwInput');
-  const pwSubmit = document.getElementById('pwSubmit');
-  const pwError = document.getElementById('pwError');
-  const bgMusic = document.getElementById('bgMusic');
-  const landingName = document.getElementById('landingName');
-
-  // Customize name
-  landingName.textContent = "Tap to Start the Surprise";
-
-  // Set password here (optional)
-  const PASSWORD = "love123"; // ← change this
-
-  let needsPassword = PASSWORD && PASSWORD.trim() !== "";
-
-  startBtn.addEventListener('click', () => {
-    if(needsPassword){ pwBox.style.display='flex'; startBtn.style.display='none'; }
-    else startExperience();
-  });
-
-  pwSubmit?.addEventListener('click', () => {
-    if(pwInput.value === PASSWORD){ startExperience(); }
-    else pwError.style.display='block';
-  });
-
-  function startExperience(){
-    landing.style.opacity = 1;
-    const fade = setInterval(()=>{
-      landing.style.opacity -= 0.05;
-      if(landing.style.opacity <= 0){ clearInterval(fade); landing.style.display='none'; }
-    }, 40);
-
-    try{ bgMusic.play(); }catch{}
-    startConfetti();
-  }
-
-  // --- Confetti Engine ---
-  const confettiCanvas = document.getElementById('confettiCanvas');
-  const cctx = confettiCanvas.getContext('2d');
-
-  function resize(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
-  window.addEventListener('resize', resize);
-  resize();
-
-  let particles = [];
-  function startConfetti(){
-    for(let i=0;i<150;i++) particles.push(makeParticle());
-    requestAnimationFrame(update);
-  }
-
-  function makeParticle(){
-    return {
-      x: Math.random()*confettiCanvas.width,
-      y: Math.random()*-50,
-      r: 6 + Math.random()*6,
-      c: `hsl(${Math.random()*360},100%,60%)`,
-      s: 2 + Math.random()*3,
-      d: 0.5 + Math.random()*1.5
-    };
-  }
-
-  function update(){
-    cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-    particles.forEach(p => {
-      p.y += p.s;
-      p.x += Math.sin(p.y*0.01) * 2;
-      if(p.y > confettiCanvas.height) Object.assign(p, makeParticle());
-      cctx.fillStyle = p.c;
-      cctx.beginPath(); cctx.arc(p.x,p.y,p.r,0,Math.PI*2); cctx.fill();
-    });
-    requestAnimationFrame(update);
-  }
-})();
-
-</script><!-- Floating hearts animation -->
-<div id="heartsContainer"></div>
-<script>
-  const heartsContainer=document.getElementById('heartsContainer');
-  function createHeart(){
-    const h=document.createElement('div');
-    h.className='heartFloat';
-    h.style.left=Math.random()*100+'%';
-    heartsContainer.appendChild(h);
-    setTimeout(()=>h.remove(),4000);
-  }
-  setInterval(createHeart,800);
-</script>
-
-<!-- Birthday Balloons -->
-<div id="balloonContainer"></div>
-<script>
-  function spawnBalloon(){
-    const b=document.createElement('div');
-    b.className='balloon';
-    b.style.left=Math.random()*90+'%';
-    b.style.background='hsl('+(Math.random()*360)+',80%,60%)';
-    balloonContainer.appendChild(b);
-    setTimeout(()=>b.remove(),7000);
-  }
-  setInterval(spawnBalloon,1500);
-</script>
-
-<!-- QR Code Generator -->
-<section style="padding:20px;text-align:center">
-  <h2 class="small">Generate a QR Code for this Website</h2>
-  <button class="btn" onclick="makeQR()">Create QR Code</button>
-  <div id="qrBox" style="margin-top:20px"></div>
-</section>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-<script>
-  function makeQR(){
-    const qr=new QRious({element:document.createElement('canvas'),value:location.href,size:200});
-    const box=document.getElementById('qrBox');
-    box.innerHTML='';
-    box.appendChild(qr.element);
-  }
-</script>
-
-<!-- Animated Quotes in Slideshow -->
-<div id="quoteBox" class="quoteStyle"></div>
-<script>
-  const quotes=[
-    "You are my today and all of my tomorrows.",
-    "Every moment with you is a gift.",
-    "My favorite place is next to you.",
-    "You make life beautiful just by being in it."
-  ];
-  function showQuote(){
-    const q=document.getElementById('quoteBox');
-    q.textContent=quotes[Math.floor(Math.random()*quotes.length)];
-    q.classList.add('show');
-    setTimeout(()=>q.classList.remove('show'),4000);
-  }
-  setInterval(showQuote,6000);
-</script>
-
-<!-- Preset Album Categories -->
-<section style="padding:20px;text-align:center">
-  <h2 class="small">Album Categories</h2>
-  <div class="categoryRow">
-    <button class="btn albumBtn" data-cat="cute">Cute Moments</button>
-    <button class="btn albumBtn" data-cat="trip">Trips</button>
-    <button class="btn albumBtn" data-cat="selfie">Selfies</button>
-    <button class="btn albumBtn" data-cat="couple">Couple Pics</button>
-  </div>
-</section>
-<script>
-  const albumButtons=document.querySelectorAll('.albumBtn');
-  albumButtons.forEach(btn=>btn.addEventListener('click',()=>{
-    alert('To assign categories, set image.category in uploader logic. Filtering UI ready.');
-  }));
-</script>
-<!-- PREMIUM ANIMATED HEADER -->
-<header id="topBanner" style="width:100%;text-align:center;padding:30px 0;">
-  <h1 style="font-size:2.8rem;font-weight:700;background:linear-gradient(90deg,#ff8eb3,#8aa8ff,#6affc5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow 3s infinite;">
-    Happy Birthday, My Love ❤️
-  </h1>
-</header>
-
-<!-- CINEMATIC INTRO -->
-<div id="cinematicIntro" style="position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;animation:fadeOut 3s ease 4s forwards;">
-  <h1 style="color:white;font-size:3rem;font-weight:600;opacity:0;animation:fadeIn 2s ease forwards;">A Special Day…</h1>
-  <p style="color:#ccc;margin-top:20px;font-size:1.2rem;opacity:0;animation:fadeIn 2s ease 1s forwards;">For the most special person</p>
-</div>
-<style>
-  @keyframes fadeOut{to{opacity:0;visibility:hidden;}}
-  @keyframes fadeIn{to{opacity:1;}}
-</style>
-
-<!-- LIGHT / DARK MODE TOGGLE -->
-<button id="modeToggle" style="position:fixed;right:20px;bottom:20px;padding:12px 18px;border-radius:50px;border:none;font-weight:600;background:#ffffff22;color:white;backdrop-filter:blur(6px);z-index:2000;">
-  🌙 Dark Mode
-</button>
-<script>
-  const toggle=document.getElementById('modeToggle');
-  let dark=true;
-  toggle.addEventListener('click',()=>{
-    dark=!dark;
-    document.body.style.background= dark ? "radial-gradient(circle at top,#0d1b3d,#050915)" : "linear-gradient(135deg,#fefefe,#e6e9f0)";
-    document.body.style.color = dark ? "#e8ecf3":"#222";
-    toggle.textContent = dark? "🌙 Dark Mode" : "☀ Light Mode";
-  });
-</script>
-
-<!-- ANIMATED IMAGE BORDERS -->
-<style>
-  .gallery img{
-    border:3px solid transparent;
-    background:linear-gradient(90deg,#ff6ec4,#5efce8) border-box;
-    -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
-    -webkit-mask-composite:xor;
-    mask-composite:exclude;
-    animation:borderGlow 4s linear infinite;
-  }
-  @keyframes borderGlow{
-    0%{filter:drop-shadow(0 0 6px #ff6ec4);} 
-    50%{filter:drop-shadow(0 0 12px #5efce8);} 
-    100%{filter:drop-shadow(0 0 6px #ff6ec4);} 
-  }
-</style>
-
-<!-- FLOATING MUSIC PLAYER -->
-<div id="musicPlayer" style="position:fixed;left:20px;bottom:20px;background:#ffffff22;padding:12px 18px;border-radius:20px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:10px;z-index:2000;color:white;">
-  <button id="playBtn" style="background:none;border:none;font-size:1.5rem;color:white;cursor:pointer;">▶</button>
-  <span>Background Music</span>
-</div>
-<audio id="bgm" src="assets/music.mp3"></audio>
-<script>
-  const bgm=document.getElementById('bgm');
-  const playBtn=document.getElementById('playBtn');
-  playBtn.addEventListener('click',()=>{
-    if(bgm.paused){bgm.play();playBtn.textContent='⏸';}
-    else{bgm.pause();playBtn.textContent='▶';}
-  });
-</script>
-
-<!-- PARALLAX LANDING EFFECT -->
-<script>
-  document.addEventListener('mousemove',e=>{
-    const x=e.clientX/window.innerWidth;
-    const y=e.clientY/window.innerHeight;
-    document.querySelector('.landing')?.style?.setProperty('background-position',`${x*10}% ${y*10}%`);
-  });
-</script>
-
+        // Optional: Fade music as user stays longer
+        const audio = document.getElementById("background-audio");
+        audio.volume = 0.17;
+    </script>
 </body>
-<!--
-==============================
-      DEPLOY SETUP GUIDE
-==============================
-GitHub Pages Deployment
------------------------
-1. Create a GitHub repository (public).
-2. Upload this HTML file to the repo as index.html.
-3. Go to: Settings → Pages → Deploy from Branch.
-4. Select main branch, folder: root.
-5. Save — your site will appear at:
-   https://yourusername.github.io/reponame/Cloudflare Pages Deployment
-
-1. Go to https://dash.cloudflare.com → Pages.
-
-
-2. Create Project → Connect Git → select your repo.
-
-
-3. Build settings:
-
-Framework: None
-
-Build command: None
-
-Output folder: /
-
-
-
-4. Deploy → Your site will get a Cloudflare URL.
-
-
-
-Direct ZIP Upload (No Git)
-
-1. Create a folder.
-
-
-2. Place this file inside as index.html.
-
-
-3. ZIP the folder.
-
-
-4. Upload to Cloudflare Pages → “Upload Asset” project.
-
-
-
-Optional Files You Can Add
-
-README.md → project overview
-
-links.json → preload image URLs
-
-/assets → music, images, icons
-
-
-If you want, I can generate the ZIP with correct structure for you.
-
--->
-
 </html>
