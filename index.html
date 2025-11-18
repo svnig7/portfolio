@@ -14,9 +14,8 @@ How to use:
  4. Click thumbnails to select for collage (selected photos get a white border). Press "Create Collage".
 
 No external libraries required.
--->
+--><!doctype html>
 
-<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -32,38 +31,143 @@ No external libraries required.
     .uploader{border:2px dashed rgba(255,255,255,0.08); padding:18px;border-radius:12px; background:rgba(255,255,255,0.02); display:flex;gap:12px;align-items:center}
     .drop{flex:1;padding:18px;border-radius:8px;text-align:center;color:rgba(230,238,246,0.8)}
     .drop.drag{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04));border-color:var(--accent)}
-    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}/* gallery */
+.controls{display:flex;gap:8px;margin-top:12px;align-items:center}
+.gallery{margin-top:18px;column-count:3;column-gap:12px}
+@media(max-width:900px){.gallery{column-count:2}}
+@media(max-width:600px){.gallery{column-count:1}}
+.thumb{break-inside:avoid;margin-bottom:12px;position:relative;cursor:pointer;overflow:hidden;border-radius:10px}
+.thumb img{width:100%;height:auto;display:block;transition:transform .25s ease}
+.thumb:hover img{transform:scale(1.03)}
+.select-mark{position:absolute;right:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px;border-radius:8px;border:2px solid rgba(255,255,255,0.06)}
+.thumb.selected{outline:4px solid rgba(255,255,255,0.07)}
 
-    /* gallery */
-    .controls{display:flex;gap:8px;margin-top:12px;align-items:center}
-    .gallery{margin-top:18px;column-count:3;column-gap:12px}
-    @media(max-width:900px){.gallery{column-count:2}}
-    @media(max-width:600px){.gallery{column-count:1}}
-    .thumb{break-inside:avoid;margin-bottom:12px;position:relative;cursor:pointer;overflow:hidden;border-radius:10px}
-    .thumb img{width:100%;height:auto;display:block;transition:transform .25s ease}
-    .thumb:hover img{transform:scale(1.03)}
-    .select-mark{position:absolute;right:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px;border-radius:8px;border:2px solid rgba(255,255,255,0.06)}
-    .thumb.selected{outline:4px solid rgba(255,255,255,0.07)}
+/* slideshow modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:50}
+.modal.show{display:flex}
+.slide{max-width:90%;max-height:90%;position:relative}
+.slide img{max-width:100%;max-height:100%;display:block;border-radius:10px}
+.nav{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;color:#fff;cursor:pointer}
+.nav.left{left:-60px}
+.nav.right{right:-60px}
+.close{position:absolute;right:12px;top:12px;font-size:20px;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;cursor:pointer}
 
-    /* slideshow modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:50}
-    .modal.show{display:flex}
-    .slide{max-width:90%;max-height:90%;position:relative}
-    .slide img{max-width:100%;max-height:100%;display:block;border-radius:10px}
-    .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;color:#fff;cursor:pointer}
-    .nav.left{left:-60px}
-    .nav.right{right:-60px}
-    .close{position:absolute;right:12px;top:12px;font-size:20px;background:rgba(0,0,0,0.35);padding:8px;border-radius:8px;cursor:pointer}
+/* collage area */
+.collage-area{margin-top:18px;display:flex;gap:12px;align-items:center}
+.collage-canvas{background:#fff;border-radius:8px;overflow:hidden}
+.small{font-size:13px;color:rgba(230,238,246,0.7)}
 
-    /* collage area */
-    .collage-area{margin-top:18px;display:flex;gap:12px;align-items:center}
-    .collage-canvas{background:#fff;border-radius:8px;overflow:hidden}
-    .small{font-size:13px;color:rgba(230,238,246,0.7)}
+footer{margin-top:28px;color:rgba(230,238,246,0.6);font-size:13px}
 
-    footer{margin-top:28px;color:rgba(230,238,246,0.6);font-size:13px}
+  </style>
+  <style>
+    /* PRO WEBSITE STYLING UPGRADE */
+    body{
+      background: radial-gradient(circle at top, #0d1b3d 0%, #050915 100%);
+      font-family: 'Poppins', sans-serif;
+      color:#e8ecf3;
+      overflow-x:hidden;
+    }
+    .landing{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      text-align:center;
+      background:linear-gradient(135deg,#0a1228 0%,#162447 100%);
+      animation:fadeIn 1.5s ease;
+    }
+    .landing h1{
+      font-size:3rem;
+      font-weight:700;
+      background:linear-gradient(90deg,#ff6ec4,#7873f5,#4ade80);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      animation:glow 3s ease-in-out infinite;
+    }
+    @keyframes glow{
+      0%{filter:drop-shadow(0 0 4px #ff6ec4);} 
+      50%{filter:drop-shadow(0 0 12px #7873f5);} 
+      100%{filter:drop-shadow(0 0 4px #ff6ec4);} 
+    }
+    .btn{
+      padding:12px 24px;
+      border-radius:12px;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      background:linear-gradient(90deg,#6a5af9,#4bc6ff);
+      border:none;
+      color:white;
+      transition:0.25s;
+    }
+    .btn:hover{
+      transform:translateY(-3px);
+      box-shadow:0 6px 18px rgba(0,0,0,0.4);
+    }
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
+      padding:20px;
+    }
+    .gallery img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:16px;
+      transition:0.35s;
+      box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    }
+    .gallery img:hover{
+      transform:scale(1.05);
+      box-shadow:0 6px 30px rgba(0,0,0,0.55);
+    }
+    #quoteBox{
+      position:absolute;
+      bottom:40px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:1.2rem;
+      opacity:0;
+      background:rgba(0,0,0,0.45);
+      padding:12px 20px;
+      border-radius:12px;
+      backdrop-filter:blur(6px);
+      transition:opacity .6s;
+    }
+    #quoteBox.show{opacity:1;}
+    .heartFloat{
+      position:fixed;
+      bottom:-30px;
+      width:24px;
+      height:24px;
+      background:url('https://cdn-icons-png.flaticon.com/512/833/833472.png') no-repeat center/contain;
+      animation:floatUp 4s ease-in infinite;
+    }
+    @keyframes floatUp{
+      0%{transform:translateY(0) scale(0.6);opacity:0.3;}
+      50%{opacity:1;}
+      100%{transform:translateY(-120vh) scale(1);opacity:0;}
+    }
   </style>
 </head>
-<body>
+<body>  <!-- Landing Page / Start Screen -->  <div id="landing" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0f1a,#14202e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;color:#fff;padding:20px">
+    <h1 style="font-size:32px;margin-bottom:10px">🎉 Happy Birthday Surprise 🎉</h1>
+    <h2 id="landingName" style="font-size:22px;margin-bottom:25px">Tap to Begin</h2><button id="startBtn" class="btn" style="font-size:18px;padding:14px 22px">Start</button>
+
+<!-- Password box hidden until needed -->
+<div id="pwBox" style="display:none;flex-direction:column;gap:10px;margin-top:20px;width:260px">
+  <input id="pwInput" type="password" placeholder="Enter Password" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%">
+  <button id="pwSubmit" class="btn">Unlock</button>
+  <div id="pwError" style="color:#ff6b6b;font-size:14px;display:none">Wrong password</div>
+</div>
+
+  </div>  <!-- Background Music --><audio id="bgMusic" src="music.mp3" preload="auto"></audio>
+
+  <!-- Confetti Canvas --><canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:150"></canvas>
+
   <div class="wrap">
     <header>
       <div>
@@ -73,67 +177,64 @@ No external libraries required.
       <div>
         <button id="autoplayToggle" class="btn" title="Toggle autoplay">Start Slideshow</button>
       </div>
-    </header>
+    </header><!-- Add images by URL -->
+<section style="margin-top:16px">
+  <div class="uploader" style="flex-direction:column;align-items:stretch">
+    <label class="small" style="margin-bottom:6px">Add photo by direct link (URL)</label>
+    <input id="urlInput" type="text" placeholder="Paste image link here (jpg, png, etc.)" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%;margin-bottom:8px">
+    <button id="addUrlBtn" class="btn">Add Image URL</button>
+  </div>
+</section>
 
-    <!-- Add images by URL -->
-    <section style="margin-top:16px">
-      <div class="uploader" style="flex-direction:column;align-items:stretch">
-        <label class="small" style="margin-bottom:6px">Add photo by direct link (URL)</label>
-        <input id="urlInput" type="text" placeholder="Paste image link here (jpg, png, etc.)" style="padding:10px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#e6eef6;width:100%;margin-bottom:8px">
-        <button id="addUrlBtn" class="btn">Add Image URL</button>
-      </div>
-    </section>
-
-    <section style="margin-top:12px">
-      <div class="uploader" id="uploader">
-        <div class="drop" id="drop">Drop photos here or click to select<br><small class="small">PNG, JPG, HEIC (if browser supports), GIF (first frame used)</small></div>
-        <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <button id="chooseBtn" class="btn">Choose files</button>
-          <button id="clearBtn" class="btn" style="background:#2b2f36">Clear all</button>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button id="createCollage" class="btn">Create Collage from selected</button>
-        <button id="downloadCollage" class="btn" style="background:#2b2f36">Download Collage</button>
-        <div class="small" style="margin-left:auto">Click thumbnails to view slideshow. Click again to select for collage.</div>
-      </div>
-
-      <div id="gallery" class="gallery"></div>
-
-      <div class="collage-area">
-        <canvas id="collageCanvas" class="collage-canvas" width="900" height="600"></canvas>
-        <div style="min-width:220px">
-          <div class="small">Collage options</div>
-          <label class="small">Canvas size: <select id="canvasSize"><option value="900x600">900×600</option><option value="1200x800">1200×800</option><option value="1600x900">1600×900</option></select></label>
-          <div style="margin-top:8px">
-            <label class="small">Layout: <select id="layout"><option value="grid">Grid</option><option value="random">Random scatter</option><option value="mosaic">Mosaic</option></select></label>
-          </div>
-          <div style="margin-top:12px">
-            <button id="regen" class="btn">Regenerate</button>
-            <button id="shuffle" class="btn" style="background:#2b2f36">Shuffle</button>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <div id="slideshowModal" class="modal" tabindex="-1">
-      <div class="slide" role="dialog">
-        <div class="close" id="closeModal">✕</div>
-        <div class="nav left" id="prev">‹</div>
-        <img id="slideImg" src="" alt="">
-        <div class="nav right" id="next">›</div>
-      </div>
+<section style="margin-top:12px">
+  <div class="uploader" id="uploader">
+    <div class="drop" id="drop">Drop photos here or click to select<br><small class="small">PNG, JPG, HEIC (if browser supports), GIF (first frame used)</small></div>
+    <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button id="chooseBtn" class="btn">Choose files</button>
+      <button id="clearBtn" class="btn" style="background:#2b2f36">Clear all</button>
     </div>
-
-    <footer>
-      <div>Made with ❤️ — Save the file locally to use offline. Works best in latest Chrome/Edge/Firefox/Safari.</div>
-    </footer>
   </div>
 
-<script>
+  <div class="controls">
+    <button id="createCollage" class="btn">Create Collage from selected</button>
+    <button id="downloadCollage" class="btn" style="background:#2b2f36">Download Collage</button>
+    <div class="small" style="margin-left:auto">Click thumbnails to view slideshow. Click again to select for collage.</div>
+  </div>
+
+  <div id="gallery" class="gallery"></div>
+
+  <div class="collage-area">
+    <canvas id="collageCanvas" class="collage-canvas" width="900" height="600"></canvas>
+    <div style="min-width:220px">
+      <div class="small">Collage options</div>
+      <label class="small">Canvas size: <select id="canvasSize"><option value="900x600">900×600</option><option value="1200x800">1200×800</option><option value="1600x900">1600×900</option></select></label>
+      <div style="margin-top:8px">
+        <label class="small">Layout: <select id="layout"><option value="grid">Grid</option><option value="random">Random scatter</option><option value="mosaic">Mosaic</option></select></label>
+      </div>
+      <div style="margin-top:12px">
+        <button id="regen" class="btn">Regenerate</button>
+        <button id="shuffle" class="btn" style="background:#2b2f36">Shuffle</button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<div id="slideshowModal" class="modal" tabindex="-1">
+  <div class="slide" role="dialog">
+    <div class="close" id="closeModal">✕</div>
+    <div class="nav left" id="prev">‹</div>
+    <img id="slideImg" src="" alt="">
+    <div class="nav right" id="next">›</div>
+  </div>
+</div>
+
+<footer>
+  <div>Made with ❤️ — Save the file locally to use offline. Works best in latest Chrome/Edge/Firefox/Safari.</div>
+</footer>
+
+  </div><script>
 (function(){
   const uploader = document.getElementById('uploader');
   const drop = document.getElementById('drop');
@@ -359,6 +460,295 @@ No external libraries required.
   // also expose an example starter: if user drops no images, we can fill with placeholders? we'll keep empty by default.
 
 })();
+// Landing + Password + Music + Confetti
+(() => {
+  const landing = document.getElementById('landing');
+  const startBtn = document.getElementById('startBtn');
+  const pwBox = document.getElementById('pwBox');
+  const pwInput = document.getElementById('pwInput');
+  const pwSubmit = document.getElementById('pwSubmit');
+  const pwError = document.getElementById('pwError');
+  const bgMusic = document.getElementById('bgMusic');
+  const landingName = document.getElementById('landingName');
+
+  // Customize name
+  landingName.textContent = "Tap to Start the Surprise";
+
+  // Set password here (optional)
+  const PASSWORD = "love123"; // ← change this
+
+  let needsPassword = PASSWORD && PASSWORD.trim() !== "";
+
+  startBtn.addEventListener('click', () => {
+    if(needsPassword){ pwBox.style.display='flex'; startBtn.style.display='none'; }
+    else startExperience();
+  });
+
+  pwSubmit?.addEventListener('click', () => {
+    if(pwInput.value === PASSWORD){ startExperience(); }
+    else pwError.style.display='block';
+  });
+
+  function startExperience(){
+    landing.style.opacity = 1;
+    const fade = setInterval(()=>{
+      landing.style.opacity -= 0.05;
+      if(landing.style.opacity <= 0){ clearInterval(fade); landing.style.display='none'; }
+    }, 40);
+
+    try{ bgMusic.play(); }catch{}
+    startConfetti();
+  }
+
+  // --- Confetti Engine ---
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const cctx = confettiCanvas.getContext('2d');
+
+  function resize(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let particles = [];
+  function startConfetti(){
+    for(let i=0;i<150;i++) particles.push(makeParticle());
+    requestAnimationFrame(update);
+  }
+
+  function makeParticle(){
+    return {
+      x: Math.random()*confettiCanvas.width,
+      y: Math.random()*-50,
+      r: 6 + Math.random()*6,
+      c: `hsl(${Math.random()*360},100%,60%)`,
+      s: 2 + Math.random()*3,
+      d: 0.5 + Math.random()*1.5
+    };
+  }
+
+  function update(){
+    cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    particles.forEach(p => {
+      p.y += p.s;
+      p.x += Math.sin(p.y*0.01) * 2;
+      if(p.y > confettiCanvas.height) Object.assign(p, makeParticle());
+      cctx.fillStyle = p.c;
+      cctx.beginPath(); cctx.arc(p.x,p.y,p.r,0,Math.PI*2); cctx.fill();
+    });
+    requestAnimationFrame(update);
+  }
+})();
+
+</script><!-- Floating hearts animation -->
+<div id="heartsContainer"></div>
+<script>
+  const heartsContainer=document.getElementById('heartsContainer');
+  function createHeart(){
+    const h=document.createElement('div');
+    h.className='heartFloat';
+    h.style.left=Math.random()*100+'%';
+    heartsContainer.appendChild(h);
+    setTimeout(()=>h.remove(),4000);
+  }
+  setInterval(createHeart,800);
 </script>
+
+<!-- Birthday Balloons -->
+<div id="balloonContainer"></div>
+<script>
+  function spawnBalloon(){
+    const b=document.createElement('div');
+    b.className='balloon';
+    b.style.left=Math.random()*90+'%';
+    b.style.background='hsl('+(Math.random()*360)+',80%,60%)';
+    balloonContainer.appendChild(b);
+    setTimeout(()=>b.remove(),7000);
+  }
+  setInterval(spawnBalloon,1500);
+</script>
+
+<!-- QR Code Generator -->
+<section style="padding:20px;text-align:center">
+  <h2 class="small">Generate a QR Code for this Website</h2>
+  <button class="btn" onclick="makeQR()">Create QR Code</button>
+  <div id="qrBox" style="margin-top:20px"></div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
+  function makeQR(){
+    const qr=new QRious({element:document.createElement('canvas'),value:location.href,size:200});
+    const box=document.getElementById('qrBox');
+    box.innerHTML='';
+    box.appendChild(qr.element);
+  }
+</script>
+
+<!-- Animated Quotes in Slideshow -->
+<div id="quoteBox" class="quoteStyle"></div>
+<script>
+  const quotes=[
+    "You are my today and all of my tomorrows.",
+    "Every moment with you is a gift.",
+    "My favorite place is next to you.",
+    "You make life beautiful just by being in it."
+  ];
+  function showQuote(){
+    const q=document.getElementById('quoteBox');
+    q.textContent=quotes[Math.floor(Math.random()*quotes.length)];
+    q.classList.add('show');
+    setTimeout(()=>q.classList.remove('show'),4000);
+  }
+  setInterval(showQuote,6000);
+</script>
+
+<!-- Preset Album Categories -->
+<section style="padding:20px;text-align:center">
+  <h2 class="small">Album Categories</h2>
+  <div class="categoryRow">
+    <button class="btn albumBtn" data-cat="cute">Cute Moments</button>
+    <button class="btn albumBtn" data-cat="trip">Trips</button>
+    <button class="btn albumBtn" data-cat="selfie">Selfies</button>
+    <button class="btn albumBtn" data-cat="couple">Couple Pics</button>
+  </div>
+</section>
+<script>
+  const albumButtons=document.querySelectorAll('.albumBtn');
+  albumButtons.forEach(btn=>btn.addEventListener('click',()=>{
+    alert('To assign categories, set image.category in uploader logic. Filtering UI ready.');
+  }));
+</script>
+<!-- PREMIUM ANIMATED HEADER -->
+<header id="topBanner" style="width:100%;text-align:center;padding:30px 0;">
+  <h1 style="font-size:2.8rem;font-weight:700;background:linear-gradient(90deg,#ff8eb3,#8aa8ff,#6affc5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow 3s infinite;">
+    Happy Birthday, My Love ❤️
+  </h1>
+</header>
+
+<!-- CINEMATIC INTRO -->
+<div id="cinematicIntro" style="position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;animation:fadeOut 3s ease 4s forwards;">
+  <h1 style="color:white;font-size:3rem;font-weight:600;opacity:0;animation:fadeIn 2s ease forwards;">A Special Day…</h1>
+  <p style="color:#ccc;margin-top:20px;font-size:1.2rem;opacity:0;animation:fadeIn 2s ease 1s forwards;">For the most special person</p>
+</div>
+<style>
+  @keyframes fadeOut{to{opacity:0;visibility:hidden;}}
+  @keyframes fadeIn{to{opacity:1;}}
+</style>
+
+<!-- LIGHT / DARK MODE TOGGLE -->
+<button id="modeToggle" style="position:fixed;right:20px;bottom:20px;padding:12px 18px;border-radius:50px;border:none;font-weight:600;background:#ffffff22;color:white;backdrop-filter:blur(6px);z-index:2000;">
+  🌙 Dark Mode
+</button>
+<script>
+  const toggle=document.getElementById('modeToggle');
+  let dark=true;
+  toggle.addEventListener('click',()=>{
+    dark=!dark;
+    document.body.style.background= dark ? "radial-gradient(circle at top,#0d1b3d,#050915)" : "linear-gradient(135deg,#fefefe,#e6e9f0)";
+    document.body.style.color = dark ? "#e8ecf3":"#222";
+    toggle.textContent = dark? "🌙 Dark Mode" : "☀ Light Mode";
+  });
+</script>
+
+<!-- ANIMATED IMAGE BORDERS -->
+<style>
+  .gallery img{
+    border:3px solid transparent;
+    background:linear-gradient(90deg,#ff6ec4,#5efce8) border-box;
+    -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    animation:borderGlow 4s linear infinite;
+  }
+  @keyframes borderGlow{
+    0%{filter:drop-shadow(0 0 6px #ff6ec4);} 
+    50%{filter:drop-shadow(0 0 12px #5efce8);} 
+    100%{filter:drop-shadow(0 0 6px #ff6ec4);} 
+  }
+</style>
+
+<!-- FLOATING MUSIC PLAYER -->
+<div id="musicPlayer" style="position:fixed;left:20px;bottom:20px;background:#ffffff22;padding:12px 18px;border-radius:20px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:10px;z-index:2000;color:white;">
+  <button id="playBtn" style="background:none;border:none;font-size:1.5rem;color:white;cursor:pointer;">▶</button>
+  <span>Background Music</span>
+</div>
+<audio id="bgm" src="assets/music.mp3"></audio>
+<script>
+  const bgm=document.getElementById('bgm');
+  const playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click',()=>{
+    if(bgm.paused){bgm.play();playBtn.textContent='⏸';}
+    else{bgm.pause();playBtn.textContent='▶';}
+  });
+</script>
+
+<!-- PARALLAX LANDING EFFECT -->
+<script>
+  document.addEventListener('mousemove',e=>{
+    const x=e.clientX/window.innerWidth;
+    const y=e.clientY/window.innerHeight;
+    document.querySelector('.landing')?.style?.setProperty('background-position',`${x*10}% ${y*10}%`);
+  });
+</script>
+
 </body>
+<!--
+==============================
+      DEPLOY SETUP GUIDE
+==============================
+GitHub Pages Deployment
+-----------------------
+1. Create a GitHub repository (public).
+2. Upload this HTML file to the repo as index.html.
+3. Go to: Settings → Pages → Deploy from Branch.
+4. Select main branch, folder: root.
+5. Save — your site will appear at:
+   https://yourusername.github.io/reponame/Cloudflare Pages Deployment
+
+1. Go to https://dash.cloudflare.com → Pages.
+
+
+2. Create Project → Connect Git → select your repo.
+
+
+3. Build settings:
+
+Framework: None
+
+Build command: None
+
+Output folder: /
+
+
+
+4. Deploy → Your site will get a Cloudflare URL.
+
+
+
+Direct ZIP Upload (No Git)
+
+1. Create a folder.
+
+
+2. Place this file inside as index.html.
+
+
+3. ZIP the folder.
+
+
+4. Upload to Cloudflare Pages → “Upload Asset” project.
+
+
+
+Optional Files You Can Add
+
+README.md → project overview
+
+links.json → preload image URLs
+
+/assets → music, images, icons
+
+
+If you want, I can generate the ZIP with correct structure for you.
+
+-->
+
 </html>
