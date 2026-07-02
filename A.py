@@ -1,303 +1,242 @@
-// ======================================
-// TMDb Telegram Bot
-// Cloudflare Worker
-// Part 1/3
-// ======================================
-
-const TG = "https://api.telegram.org";
-const TMDB = "https://api.themoviedb.org/3";
-const IMAGE = "https://image.tmdb.org/t/p/w500";
-
-// ----------------------------
-// Telegram API
-// ----------------------------
-
-async function telegram(env, method, body) {
-  const res = await fetch(
-    `${TG}/bot${env.BOT_TOKEN}/${method}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    }
-  );
+import os
+import time
+import requests
+from io import BytesIO
+from PIL import Image
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
 
-  return res.json();
-}
+# ---------------- CONFIG ---------------- #
 
-async function sendMessage(env, chatId, text) {
-  return telegram(env, "sendMessage", {
-    chat_id: chatId,
-    text,
-    parse_mode: "HTML",
-    disable_web_page_preview: true
-  });
-}
+TMDB_API = "315c5d1be103903d6c1283835d83da13"
+BOT_TOKEN = "7970007527:AAEnvvj_N2-LR_HSYmT_7xaul2ejbmgo1ZI"
 
-async function sendPhoto(env, chatId, photo, caption) {
-  return telegram(env, "sendPhoto", {
-    chat_id: chatId,
-    photo,
-    caption,
-    parse_mode: "HTML"
-  });
-}
+TMDB_IMG = "https://image.tmdb.org/t/p/original"
 
-// ----------------------------
-// TMDb Search
-// ----------------------------
+# ---------------- SIMPLE CACHE ---------------- #
 
-async function tmdbSearch(env, type, query) {
+CACHE = {}
+CACHE_TTL = 3600  # 1 hour
+IMG_CACHE = {}
 
-  const url =
-    `${TMDB}/search/${type}` +
-    `?api_key=${env.TMDB_API_KEY}` +
-    `&query=${encodeURIComponent(query)}`;
 
-  const res = await fetch(url);
+def cache_get(key):
+    data = CACHE.get(key)
+    if not data:
+        return None
 
-  if (!res.ok)
-    return null;
+    value, timestamp = data
+    if time.time() - timestamp > CACHE_TTL:
+        del CACHE[key]
+        return None
 
-  const data = await res.json();
+    return value
 
-  if (!data.results || data.results.length === 0)
-    return null;
 
-  return data.results[0];
-}
+def cache_set(key, value):
+    CACHE[key] = (value, time.time())
 
-function poster(path) {
-  if (!path) return null;
-  return IMAGE + path;
-}
 
-// ----------------------------
-// Movie
-// ----------------------------
+# ---------------- TMDB ---------------- #
 
-async function movie(env, chatId, query) {
+def tmdb_get(url, params=None):
+    params = params or {}
+    params["api_key"] = TMDB_API
 
-  const data = await tmdbSearch(env, "movie", query);
+    cache_key = url + str(sorted(params.items()))
+    cached = cache_get(cache_key)
+    if cached:
+        return cached
 
-  if (!data) {
-    return sendMessage(env, chatId, "❌ Movie not found.");
-  }
+    data = requests.get(url, params=params).json()
+    cache_set(cache_key, data)
+    return data
 
-  const text =
-`🎬 <b>${data.title}</b>
 
-⭐ Rating: ${data.vote_average}
+def get_external_ids(media_type, tmdb_id):
+    url = f"https://api.themoviedb.org/3/{media_type}/{tmdb_id}/external_ids"
+    return tmdb_get(url)
 
-📅 Release:
-${data.release_date || "Unknown"}
 
-📝
-${data.overview || "No overview available."}`;
+# ---------------- HD POSTER ---------------- #
 
-  const img = poster(data.poster_path);
+def make_thumbnail(image_url):
+    if image_url in IMG_CACHE:
+        return IMG_CACHE[image_url]
 
-  if (img)
-    return sendPhoto(env, chatId, img, text);
+    img_data = requests.get(image_url).content
+    img = Image.open(BytesIO(img_data)).convert("RGB")
 
-  return sendMessage(env, chatId, text);
-}
+    # YouTube HD size
+    img = img.resize((1280, 720), Image.Resampling.LANCZOS)
 
-// ======================================
-// Part 2 continues below...
-// ======================================
+    output = BytesIO()
+    img.save(output, format="JPEG", quality=95, optimize=True)
+    output.seek(0)
 
-  // ======================================
-// Part 2/3
-// ======================================
+    IMG_CACHE[image_url] = output
+    return output
 
-// ----------------------------
-// TV Search
-// ----------------------------
 
-async function tv(env, chatId, query) {
+# ---------------- MOVIE ---------------- #
 
-  const data = await tmdbSearch(env, "tv", query);
+async def movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = " ".join(context.args)
+    if not query:
+        await update.message.reply_text("Usage: /movie interstellar")
+        return
 
-  if (!data) {
-    return sendMessage(env, chatId, "❌ TV Show not found.");
-  }
+    search = tmdb_get(
+        "https://api.themoviedb.org/3/search/movie",
+        {"query": query}
+    )
 
-  const text =
-`📺 <b>${data.name}</b>
+    if not search.get("results"):
+        await update.message.reply_text("No movie found.")
+        return
 
-⭐ Rating: ${data.vote_average}
+    m = search["results"][0]
+    tmdb_id = m["id"]
 
-📅 First Air Date:
-${data.first_air_date || "Unknown"}
+    details = tmdb_get(f"https://api.themoviedb.org/3/movie/{tmdb_id}")
+    ext = get_external_ids("movie", tmdb_id)
 
-📝
-${data.overview || "No overview available."}`;
+    title = details.get("title", "Unknown")
+    year = details.get("release_date", "N/A")[:4]
+    genres = ", ".join([g["name"] for g in details.get("genres", [])])
+    plot = details.get("overview", "N/A")
+    imdb_id = ext.get("imdb_id", "N/A")
 
-  const img = poster(data.poster_path);
+    poster = TMDB_IMG + details["poster_path"]
 
-  if (img)
-    return sendPhoto(env, chatId, img, text);
+    caption = (
+        f"🎬 *Title* : {title}\n"
+        f"📅 *Year* : {year}\n"
+        f"🎭 *Genre* : {genres}\n"
+        f"📝 *Plot* : {plot}\n"
+        f"🆔 *TMDB ID* : {tmdb_id} | *IMDb ID* : {imdb_id}"
+    )
 
-  return sendMessage(env, chatId, text);
-}
+    img = make_thumbnail(poster)
 
-// ----------------------------
-// Person Search
-// ----------------------------
+    await update.message.reply_photo(
+        photo=img,
+        caption=caption,
+        parse_mode="Markdown"
+    )
 
-async function person(env, chatId, query) {
 
-  const data = await tmdbSearch(env, "person", query);
+# ---------------- TV ---------------- #
 
-  if (!data) {
-    return sendMessage(env, chatId, "❌ Person not found.");
-  }
+async def tv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = " ".join(context.args)
+    if not query:
+        await update.message.reply_text("Usage: /tv breaking bad")
+        return
 
-  const text =
-`🎭 <b>${data.name}</b>
+    search = tmdb_get(
+        "https://api.themoviedb.org/3/search/tv",
+        {"query": query}
+    )
 
-Known For:
-${data.known_for_department || "Unknown"}
+    if not search.get("results"):
+        await update.message.reply_text("No TV show found.")
+        return
 
-Popularity:
-${Math.round(data.popularity || 0)}`;
+    t = search["results"][0]
+    tmdb_id = t["id"]
 
-  const img = poster(data.profile_path);
+    details = tmdb_get(f"https://api.themoviedb.org/3/tv/{tmdb_id}")
+    ext = get_external_ids("tv", tmdb_id)
 
-  if (img)
-    return sendPhoto(env, chatId, img, text);
+    title = details.get("name", "Unknown")
+    genres = ", ".join([g["name"] for g in details.get("genres", [])])
+    imdb_id = ext.get("imdb_id", "N/A")
 
-  return sendMessage(env, chatId, text);
-}
+    seasons = details.get("seasons", [])
 
-// ----------------------------
-// Command Handler
-// ----------------------------
+    main_poster_path = details.get("poster_path")
 
-async function handleCommand(env, chatId, text) {
+    # ---------------- MAIN POSTER ---------------- #
 
-  if (!text) return;
+    if main_poster_path:
+        img = make_thumbnail(TMDB_IMG + main_poster_path)
 
-  if (text === "/start") {
+        caption = (
+            f"📺 *Title* : {title}\n"
+            f"🎭 *Genre* : {genres}\n"
+            f"🆔 *TMDB ID* : {tmdb_id} | *IMDb ID* : {imdb_id}"
+        )
 
-    return sendMessage(
-      env,
-      chatId,
-`🎬 <b>Welcome to TMDb Bot</b>
+        await update.message.reply_photo(
+            photo=img,
+            caption=caption,
+            parse_mode="Markdown"
+        )
 
-Commands:
+    # ---------------- SEASONS ---------------- #
 
-/movie Movie Name
-/tv TV Show Name
-/person Person Name
+    for season in seasons:
+        season_no = season.get("season_number")
+        if season_no == 0:
+            continue
 
-Examples:
+        season_data = tmdb_get(
+            f"https://api.themoviedb.org/3/tv/{tmdb_id}/season/{season_no}"
+        )
 
-/movie Avatar
-/tv Breaking Bad
-/person Tom Cruise`
-    );
+        plot = season_data.get("overview", "N/A")
+        air_date = season_data.get("air_date", "N/A")[:4]
 
-  }
+        poster_path = (
+            season_data.get("poster_path")
+            or season.get("poster_path")
+            or main_poster_path
+        )
 
-  if (text.startsWith("/movie ")) {
-    return movie(
-      env,
-      chatId,
-      text.substring(7).trim()
-    );
-  }
+        if not poster_path:
+            continue
 
-  if (text.startsWith("/tv ")) {
-    return tv(
-      env,
-      chatId,
-      text.substring(4).trim()
-    );
-  }
+        img = make_thumbnail(TMDB_IMG + poster_path)
 
-  if (text.startsWith("/person ")) {
-    return person(
-      env,
-      chatId,
-      text.substring(8).trim()
-    );
-  }
+        caption = (
+            f"📺 *Title* : {title}\n"
+            f"🎞 *Season* : {season_no}\n"
+            f"📅 *Year* : {air_date}\n"
+            f"🎭 *Genre* : {genres}\n"
+            f"📝 *Plot* : {plot[:300]}\n"
+            f"🆔 *TMDB ID* : {tmdb_id} | *IMDb ID* : {imdb_id}"
+        )
 
-  return sendMessage(
-    env,
-    chatId,
-`❓ Unknown command.
+        await update.message.reply_photo(
+            photo=img,
+            caption=caption,
+            parse_mode="Markdown"
+        )
 
-Use:
 
-/movie Movie Name
-/tv TV Show Name
-/person Person Name`
-  );
+# ---------------- START ---------------- #
 
-}
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🎬 TMDB Bot Ready!\n\n"
+        "/movie name\n"
+        "/tv name"
+    )
 
-// ======================================
-// Part 3 continues below...
-// ======================================
 
-  // ======================================
-// Part 3/3
-// Cloudflare Worker Entry
-// ======================================
+# ---------------- MAIN ---------------- #
 
-export default {
-  async fetch(request, env) {
+def main():
+    app = Application.builder().token(BOT_TOKEN).build()
 
-    // Health check
-    if (request.method === "GET") {
-      return new Response(
-        "✅ TMDb Telegram Bot is running!",
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "text/plain"
-          }
-        }
-      );
-    }
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("movie", movie))
+    app.add_handler(CommandHandler("tv", tv))
 
-    // Only allow POST from Telegram
-    if (request.method !== "POST") {
-      return new Response("Method Not Allowed", {
-        status: 405
-      });
-    }
+    print("Bot running...")
+    app.run_polling()
 
-    try {
 
-      const update = await request.json();
-
-      // Ignore non-message updates
-      if (!update.message) {
-        return new Response("OK");
-      }
-
-      const chatId = update.message.chat.id;
-      const text = (update.message.text || "").trim();
-
-      await handleCommand(env, chatId, text);
-
-      return new Response("OK");
-
-    } catch (error) {
-
-      console.error(error);
-
-      return new Response("Internal Server Error", {
-        status: 500
-      });
-
-    }
-
-  }
-};
+if __name__ == "__main__":
+    main()
