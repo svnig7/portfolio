@@ -1,40 +1,33 @@
-// ================================
+// ======================================
 // TMDb Telegram Bot
+// Cloudflare Worker
 // Part 1/3
-// ================================
-
-interface Env {
-  BOT_TOKEN: string;
-  TMDB_API_KEY: string;
-}
+// ======================================
 
 const TG = "https://api.telegram.org";
 const TMDB = "https://api.themoviedb.org/3";
-const IMG = "https://image.tmdb.org/t/p/w500";
+const IMAGE = "https://image.tmdb.org/t/p/w500";
 
-// --------------------
+// ----------------------------
 // Telegram API
-// --------------------
+// ----------------------------
 
-async function telegram(
-  env: Env,
-  method: string,
-  body: any
-) {
-  return fetch(`${TG}/bot${env.BOT_TOKEN}/${method}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
+async function telegram(env, method, body) {
+  const res = await fetch(
+    `${TG}/bot${env.BOT_TOKEN}/${method}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    }
+  );
+
+  return res.json();
 }
 
-async function sendMessage(
-  env: Env,
-  chatId: number,
-  text: string
-) {
+async function sendMessage(env, chatId, text) {
   return telegram(env, "sendMessage", {
     chat_id: chatId,
     text,
@@ -43,12 +36,7 @@ async function sendMessage(
   });
 }
 
-async function sendPhoto(
-  env: Env,
-  chatId: number,
-  photo: string,
-  caption: string
-) {
+async function sendPhoto(env, chatId, photo, caption) {
   return telegram(env, "sendPhoto", {
     chat_id: chatId,
     photo,
@@ -57,15 +45,12 @@ async function sendPhoto(
   });
 }
 
-// --------------------
+// ----------------------------
 // TMDb Search
-// --------------------
+// ----------------------------
 
-async function tmdbSearch(
-  env: Env,
-  type: "movie" | "tv" | "person",
-  query: string
-) {
+async function tmdbSearch(env, type, query) {
+
   const url =
     `${TMDB}/search/${type}` +
     `?api_key=${env.TMDB_API_KEY}` +
@@ -73,9 +58,10 @@ async function tmdbSearch(
 
   const res = await fetch(url);
 
-  if (!res.ok) return null;
+  if (!res.ok)
+    return null;
 
-  const data: any = await res.json();
+  const data = await res.json();
 
   if (!data.results || data.results.length === 0)
     return null;
@@ -83,200 +69,204 @@ async function tmdbSearch(
   return data.results[0];
 }
 
-function poster(path?: string) {
+function poster(path) {
   if (!path) return null;
-  return `${IMG}${path}`;
+  return IMAGE + path;
 }
 
-// ================================
-// Part 2 starts next
-// ================================
+// ----------------------------
+// Movie
+// ----------------------------
 
-// ================================
+async function movie(env, chatId, query) {
+
+  const data = await tmdbSearch(env, "movie", query);
+
+  if (!data) {
+    return sendMessage(env, chatId, "❌ Movie not found.");
+  }
+
+  const text =
+`🎬 <b>${data.title}</b>
+
+⭐ Rating: ${data.vote_average}
+
+📅 Release:
+${data.release_date || "Unknown"}
+
+📝
+${data.overview || "No overview available."}`;
+
+  const img = poster(data.poster_path);
+
+  if (img)
+    return sendPhoto(env, chatId, img, text);
+
+  return sendMessage(env, chatId, text);
+}
+
+// ======================================
+// Part 2 continues below...
+// ======================================
+
+  // ======================================
 // Part 2/3
-// Command Handlers
-// ================================
+// ======================================
 
-async function handleCommand(
-  env: Env,
-  chatId: number,
-  text: string
-) {
+// ----------------------------
+// TV Search
+// ----------------------------
 
-  // /start
+async function tv(env, chatId, query) {
+
+  const data = await tmdbSearch(env, "tv", query);
+
+  if (!data) {
+    return sendMessage(env, chatId, "❌ TV Show not found.");
+  }
+
+  const text =
+`📺 <b>${data.name}</b>
+
+⭐ Rating: ${data.vote_average}
+
+📅 First Air Date:
+${data.first_air_date || "Unknown"}
+
+📝
+${data.overview || "No overview available."}`;
+
+  const img = poster(data.poster_path);
+
+  if (img)
+    return sendPhoto(env, chatId, img, text);
+
+  return sendMessage(env, chatId, text);
+}
+
+// ----------------------------
+// Person Search
+// ----------------------------
+
+async function person(env, chatId, query) {
+
+  const data = await tmdbSearch(env, "person", query);
+
+  if (!data) {
+    return sendMessage(env, chatId, "❌ Person not found.");
+  }
+
+  const text =
+`🎭 <b>${data.name}</b>
+
+Known For:
+${data.known_for_department || "Unknown"}
+
+Popularity:
+${Math.round(data.popularity || 0)}`;
+
+  const img = poster(data.profile_path);
+
+  if (img)
+    return sendPhoto(env, chatId, img, text);
+
+  return sendMessage(env, chatId, text);
+}
+
+// ----------------------------
+// Command Handler
+// ----------------------------
+
+async function handleCommand(env, chatId, text) {
+
+  if (!text) return;
+
   if (text === "/start") {
-    await sendMessage(
+
+    return sendMessage(
       env,
       chatId,
-`🎬 <b>TMDb Telegram Bot</b>
+`🎬 <b>Welcome to TMDb Bot</b>
 
-Welcome!
-
-Available Commands:
+Commands:
 
 /movie Movie Name
 /tv TV Show Name
 /person Person Name
 
-Example:
-/movie Avatar`
-    );
-    return;
-  }
-
-  // -----------------------
-  // /movie
-  // -----------------------
-  if (text.startsWith("/movie ")) {
-
-    const query = text.replace("/movie", "").trim();
-
-    if (!query) {
-      await sendMessage(env, chatId, "Usage:\n/movie Movie Name");
-      return;
-    }
-
-    const movie = await tmdbSearch(env, "movie", query);
-
-    if (!movie) {
-      await sendMessage(env, chatId, "❌ Movie not found.");
-      return;
-    }
-
-    const caption =
-`🎬 <b>${movie.title}</b>
-
-⭐ Rating: ${movie.vote_average ?? "N/A"}
-
-📅 Release:
-${movie.release_date || "Unknown"}
-
-📝
-${movie.overview || "No overview available."}`;
-
-    const img = poster(movie.poster_path);
-
-    if (img) {
-      await sendPhoto(env, chatId, img, caption);
-    } else {
-      await sendMessage(env, chatId, caption);
-    }
-
-    return;
-  }
-
-  // -----------------------
-  // /tv
-  // -----------------------
-  if (text.startsWith("/tv ")) {
-
-    const query = text.replace("/tv", "").trim();
-
-    if (!query) {
-      await sendMessage(env, chatId, "Usage:\n/tv TV Show Name");
-      return;
-    }
-
-    const tv = await tmdbSearch(env, "tv", query);
-
-    if (!tv) {
-      await sendMessage(env, chatId, "❌ TV Show not found.");
-      return;
-    }
-
-    const caption =
-`📺 <b>${tv.name}</b>
-
-⭐ Rating: ${tv.vote_average ?? "N/A"}
-
-📅 First Air Date:
-${tv.first_air_date || "Unknown"}
-
-📝
-${tv.overview || "No overview available."}`;
-
-    const img = poster(tv.poster_path);
-
-    if (img) {
-      await sendPhoto(env, chatId, img, caption);
-    } else {
-      await sendMessage(env, chatId, caption);
-    }
-
-    return;
-  }
-
-  // -----------------------
-  // /person
-  // -----------------------
-  if (text.startsWith("/person ")) {
-
-    const query = text.replace("/person", "").trim();
-
-    if (!query) {
-      await sendMessage(env, chatId, "Usage:\n/person Person Name");
-      return;
-    }
-
-    const person = await tmdbSearch(env, "person", query);
-
-    if (!person) {
-      await sendMessage(env, chatId, "❌ Person not found.");
-      return;
-    }
-
-    const caption =
-`🎭 <b>${person.name}</b>
-
-Known For:
-${person.known_for_department || "Unknown"}
-
-Popularity:
-${person.popularity || "N/A"}`;
-
-    const img = poster(person.profile_path);
-
-    if (img) {
-      await sendPhoto(env, chatId, img, caption);
-    } else {
-      await sendMessage(env, chatId, caption);
-    }
-
-    return;
-  }
-
-  // Unknown command
-  await sendMessage(
-    env,
-    chatId,
-`Unknown command.
-
-Try:
+Examples:
 
 /movie Avatar
 /tv Breaking Bad
 /person Tom Cruise`
+    );
+
+  }
+
+  if (text.startsWith("/movie ")) {
+    return movie(
+      env,
+      chatId,
+      text.substring(7).trim()
+    );
+  }
+
+  if (text.startsWith("/tv ")) {
+    return tv(
+      env,
+      chatId,
+      text.substring(4).trim()
+    );
+  }
+
+  if (text.startsWith("/person ")) {
+    return person(
+      env,
+      chatId,
+      text.substring(8).trim()
+    );
+  }
+
+  return sendMessage(
+    env,
+    chatId,
+`❓ Unknown command.
+
+Use:
+
+/movie Movie Name
+/tv TV Show Name
+/person Person Name`
   );
+
 }
 
-// ================================
-// Part 3/3 starts next
-// ================================
+// ======================================
+// Part 3 continues below...
+// ======================================
 
-  // ================================
+  // ======================================
 // Part 3/3
-// Cloudflare Worker Entry Point
-// ================================
+// Cloudflare Worker Entry
+// ======================================
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request, env) {
 
     // Health check
     if (request.method === "GET") {
-      return new Response("TMDb Telegram Bot is running ✅");
+      return new Response(
+        "✅ TMDb Telegram Bot is running!",
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "text/plain"
+          }
+        }
+      );
     }
 
-    // Telegram sends POST requests
+    // Only allow POST from Telegram
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", {
         status: 405
@@ -285,7 +275,7 @@ export default {
 
     try {
 
-      const update: any = await request.json();
+      const update = await request.json();
 
       // Ignore non-message updates
       if (!update.message) {
@@ -299,14 +289,15 @@ export default {
 
       return new Response("OK");
 
-    } catch (err: any) {
+    } catch (error) {
 
-      console.log(err);
+      console.error(error);
 
       return new Response("Internal Server Error", {
         status: 500
       });
 
     }
+
   }
 };
