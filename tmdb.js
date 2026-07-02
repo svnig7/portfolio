@@ -68,106 +68,110 @@ async function handleTelegram(update, env) {
 
     // ---------------- MOVIE ---------------- //
     if (text.startsWith("/movie")) {
+      const query = text.replace("/movie", "").trim();
 
-  const query = text.replace("/movie", "").trim();
+      const search = await tmdb(
+        `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`,
+        env.TMDB_API
+      );
 
-  let details;
-  let movie;
+      if (!search.results || !search.results.length) {
+        await sendMessage(chatId, "❌ No movie found", env);
+        return new Response("ok");
+      }
 
-  // Search by TMDB ID
-  if (/^\d+$/.test(query)) {
+      const movie = search.results[0];
 
-    details = await tmdb(
-      `https://api.themoviedb.org/3/movie/${query}?`,
-      env.TMDB_API
-    );
+      const details = await tmdb(
+        `https://api.themoviedb.org/3/movie/${movie.id}?`,
+        env.TMDB_API
+      );
 
-    movie = details;
+      const ext = await getExternalIds("movie", movie.id, env.TMDB_API);
 
-  } else {
+      const poster = details.poster_path
+        ? `https://image.tmdb.org/t/p/w780${details.poster_path}`
+        : null;
 
-    // Extract year from end
-    const match = query.match(/(.+?)\s+(\d{4})$/);
+      const caption =
+`🎬 Title : ${details.title}
+📅 Year : ${details.release_date?.slice(0,4)}
+🎭 Genre : ${details.genres?.map(g => g.name).join(", ")}
+📝 Plot : ${details.overview}
+🆔 TMDB ID : ${movie.id} | IMDb ID : ${ext.imdb_id}`;
 
-    let name = query;
-    let year = "";
-
-    if (match) {
-      name = match[1];
-      year = match[2];
-    }
-
-    const search = await tmdb(
-      `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(name)}${year ? `&year=${year}` : ""}`,
-      env.TMDB_API
-    );
-
-    if (!search.results?.length) {
-      await sendMessage(chatId, "❌ Movie not found", env);
-      return new Response("ok");
-    }
-
-    movie = search.results[0];
-
-    details = await tmdb(
-      `https://api.themoviedb.org/3/movie/${movie.id}?`,
-      env.TMDB_API
-    );
-  }
-
-  const ext = await getExternalIds("movie", details.id, env.TMDB_API);
-
-  ...
+      if (poster) {
+        await sendPhoto(chatId, poster, caption, env);
+      } else {
+        await sendMessage(chatId, caption, env);
+      }
     }
 
     // ---------------- TV ---------------- //
     if (text.startsWith("/tv")) {
       const query = text.replace("/tv", "").trim();
 
-let details;
-let tv;
+      const search = await tmdb(
+        `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}`,
+        env.TMDB_API
+      );
 
-// Search by TMDB ID
-if (/^\d+$/.test(query)) {
+      if (!search.results || !search.results.length) {
+        await sendMessage(chatId, "❌ No TV show found", env);
+        return new Response("ok");
+      }
 
-  details = await tmdb(
-    `https://api.themoviedb.org/3/tv/${query}?`,
-    env.TMDB_API
-  );
+      const tv = search.results[0];
 
-  tv = details;
+      const details = await tmdb(
+        `https://api.themoviedb.org/3/tv/${tv.id}?`,
+        env.TMDB_API
+      );
 
-} else {
+      const ext = await getExternalIds("tv", tv.id, env.TMDB_API);
 
-  const match = query.match(/(.+?)\s+(\d{4})$/);
+      const mainPoster = details.poster_path
+        ? `https://image.tmdb.org/t/p/w780${details.poster_path}`
+        : null;
 
-  let name = query;
-  let year = "";
+      const captionMain =
+`📺 Title : ${details.name}
+🎭 Genre : ${details.genres?.map(g => g.name).join(", ")}
+🆔 TMDB ID : ${tv.id} | IMDb ID : ${ext.imdb_id}`;
 
-  if (match) {
-    name = match[1];
-    year = match[2];
-  }
+      if (mainPoster) {
+        await sendPhoto(chatId, mainPoster, captionMain, env);
+      }
 
-  const search = await tmdb(
-    `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(name)}${year ? `&first_air_date_year=${year}` : ""}`,
-    env.TMDB_API
-  );
+      const seasons = details.seasons || [];
 
-  if (!search.results?.length) {
-    await sendMessage(chatId, "❌ TV show not found", env);
-    return new Response("ok");
-  }
+      for (const season of seasons) {
+        if (season.season_number === 0) continue;
 
-  tv = search.results[0];
+        const seasonData = await tmdb(
+          `https://api.themoviedb.org/3/tv/${tv.id}/season/${season.season_number}?`,
+          env.TMDB_API
+        );
 
-  details = await tmdb(
-    `https://api.themoviedb.org/3/tv/${tv.id}?`,
-    env.TMDB_API
-  );
-}
+        const poster = seasonData.poster_path || details.poster_path;
 
-const ext = await getExternalIds("tv", details.id, env.TMDB_API);
+        const finalPoster = poster
+          ? `https://image.tmdb.org/t/p/w780${poster}`
+          : null;
+
+        const caption =
+`📺 Title : ${details.name}
+🎞 Season : ${season.season_number}
+📅 Year : ${seasonData.air_date?.slice(0,4)}
+🎭 Genre : ${details.genres?.map(g => g.name).join(", ")}
+📝 Plot : ${seasonData.overview}
+🆔 TMDB ID : ${tv.id} | IMDb ID : ${ext.imdb_id}`;
+
+        if (finalPoster) {
+          await sendPhoto(chatId, finalPoster, caption, env);
+        }
+      }
+    }
 
     return new Response("ok");
 
