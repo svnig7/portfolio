@@ -2,10 +2,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Health Check
     if (url.pathname === "/") {
-      return new Response("Telegram Cover Bot Running ✅");
+      return new Response("Thumbnail Cover Bot Running ✅");
     }
 
+    // Telegram Webhook
     if (url.pathname === "/webhook") {
       const update = await request.json();
 
@@ -21,44 +23,65 @@ export default {
     }
 
     return new Response("Not Found", { status: 404 });
-  },
+  }
 };
 
-// ================= CONFIG =================
+// =====================================
+// Telegram API
+// =====================================
 
-const API = (token) => `https://api.telegram.org/bot${token}`;
+function api(token) {
+  return `https://api.telegram.org/bot${token}`;
+}
 
-// ================= TELEGRAM API =================
-
-async function tg(token, method, data) {
-  const res = await fetch(`${API(token)}/${method}`, {
+async function tg(token, method, body) {
+  const res = await fetch(`${api(token)}/${method}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(body)
   });
 
-  return res.json();
+  return await res.json();
 }
 
-// ================= MESSAGE HANDLER =================
+// =====================================
+// HTML Escape
+// =====================================
+
+function escapeHTML(text = "") {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// =====================================
+// Main Handler
+// =====================================
 
 async function handleMessage(msg, env) {
 
   const chatId = msg.chat.id;
   const userId = msg.from.id;
 
-  // ---------------- SAVE PHOTO ----------------
+  // -----------------------------
+  // Save Thumbnail
+  // -----------------------------
 
   if (msg.photo) {
 
-    // largest size
     const photo = msg.photo[msg.photo.length - 1];
+
+    const data = {
+      file_id: photo.file_id,
+      caption: msg.caption || ""
+    };
 
     await env.THUMBNAILS.put(
       userId.toString(),
-      photo.file_id
+      JSON.stringify(data)
     );
 
     await tg(env.BOT_TOKEN, "sendMessage", {
@@ -69,23 +92,36 @@ async function handleMessage(msg, env) {
     return;
   }
 
-  // ---------------- VIDEO ----------------
+  // -----------------------------
+  // Process Video
+  // -----------------------------
 
   if (msg.video) {
 
-    const cover = await env.THUMBNAILS.get(
+    const saved = await env.THUMBNAILS.get(
       userId.toString()
     );
 
-    if (!cover) {
-
+    if (!saved) {
       await tg(env.BOT_TOKEN, "sendMessage", {
         chat_id: chatId,
         text: "❌ No thumbnail found.\n\nSend a photo first."
       });
-
       return;
     }
+
+    const thumb = JSON.parse(saved);
+
+    const cover = thumb.file_id;
+    const imageCaption = thumb.caption || "";
+
+    const videoCaption = msg.caption || "";
+
+    const finalCaption =
+      `<code>${escapeHTML(videoCaption)}</code>` +
+      (imageCaption
+        ? `\n\n<blockquote>${escapeHTML(imageCaption)}</blockquote>`
+        : "");
 
     const processing = await tg(
       env.BOT_TOKEN,
@@ -99,25 +135,24 @@ async function handleMessage(msg, env) {
     const processingMessageId =
       processing.result.message_id;
 
-    const caption = msg.caption || "";
+    // Continue in Part 2...
 
-    // Part 2 will edit this message into the final video.
-
-    await processVideo(
+      await processVideo(
       env,
       chatId,
       processingMessageId,
       msg.video.file_id,
       cover,
-      caption
+      finalCaption
     );
 
     return;
   }
-
 }
 
-// ================= PROCESS VIDEO =================
+// =====================================
+// Edit Processing Message → Video
+// =====================================
 
 async function processVideo(
   env,
@@ -139,16 +174,16 @@ async function processVideo(
         type: "video",
         media: videoFileId,
         caption: caption,
+        parse_mode: "HTML",
         supports_streaming: true,
 
-        // Telegram Bot API 8.0+
+        // Telegram Bot API 8+
         cover: coverFileId
       }
     }
   );
 
-  // If editMessageMedia fails, delete the
-  // processing message and send the video normally.
+  // If editing fails, send the video normally.
   if (!result.ok) {
 
     console.log(result);
@@ -161,13 +196,14 @@ async function processVideo(
     await tg(env.BOT_TOKEN, "sendVideo", {
       chat_id: chatId,
       video: videoFileId,
+      cover: coverFileId,
       caption: caption,
-      supports_streaming: true,
-      cover: coverFileId
+      parse_mode: "HTML",
+      supports_streaming: true
     });
 
     return;
   }
 
-  console.log("Video processed successfully.");
+  console.log("Video sent successfully.");
 }
