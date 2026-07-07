@@ -53,10 +53,26 @@ async function searchTMDB() {
     const url =
 `https://api.themoviedb.org/3/search/multi?api_key=${CONFIG.TMDB_API_KEY}&query=${encodeURIComponent(query)}`;
 
+    try {
+
     const res = await fetch(url);
 
     const data = await res.json();
 
+    displayResults(data.results || []);
+
+    statusBox.innerText =
+    `${data.results.length} result(s) found`;
+
+}
+catch(error){
+
+    console.error(error);
+
+    statusBox.innerText =
+    "❌ TMDB API Error";
+
+}
     displayResults(data.results || []);
 
     statusBox.innerText =
