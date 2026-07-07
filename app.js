@@ -456,6 +456,7 @@ downloadBtn.addEventListener("click", () => {
 telegramBtn.addEventListener("click", uploadTelegram);
 
 async function uploadTelegram() {
+async function uploadTelegram() {
 
     if (!generatedBlob) {
         alert("Generate a thumbnail first.");
@@ -471,7 +472,19 @@ async function uploadTelegram() {
 
     try {
 
-        if (result.success)
+        const form = new FormData();
+
+        form.append(
+            "image",
+            generatedBlob,
+            "thumbnail.png"
+        );
+
+        form.append(
+            "caption",
+            captionBox.value
+        );
+
 
         const response = await fetch(
             CONFIG.WORKER_URL,
@@ -481,7 +494,9 @@ async function uploadTelegram() {
             }
         );
 
+
         const result = await response.json();
+
 
         if (result.success) {
 
@@ -493,9 +508,13 @@ async function uploadTelegram() {
             statusBox.innerText =
                 "❌ Upload failed.";
 
-            alert(result.error || "Telegram upload failed.");
+            alert(
+                result.error || 
+                "Telegram upload failed."
+            );
 
         }
+
 
     } catch (err) {
 
@@ -509,4 +528,3 @@ async function uploadTelegram() {
     }
 
 }
-
