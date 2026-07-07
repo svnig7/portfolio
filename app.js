@@ -471,18 +471,7 @@ async function uploadTelegram() {
 
     try {
 
-        const form = new FormData();
-
-        form.append(
-            "photo",
-            generatedBlob,
-            "thumbnail.png"
-        );
-
-        form.append(
-            "caption",
-            captionBox.value
-        );
+        if (result.success)
 
         const response = await fetch(
             CONFIG.WORKER_URL,
@@ -494,7 +483,7 @@ async function uploadTelegram() {
 
         const result = await response.json();
 
-        if (result.ok) {
+        if (result.success) {
 
             statusBox.innerText =
                 "✅ Uploaded successfully.";
