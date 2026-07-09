@@ -80,14 +80,24 @@ async function handleMessage(msg, env) {
     };
 
     await env.THUMBNAILS.put(
-      userId.toString(),
-      JSON.stringify(data)
-    );
+  userId.toString(),
+  JSON.stringify(data)
+);
 
-    await tg(env.BOT_TOKEN, "sendMessage", {
-      chat_id: chatId,
-      text: "✅ Thumbnail saved.\n\nNow send a video."
-    });
+// Reset episode counter for this season
+const seasonMatch = (msg.caption || "").match(/🎞\s*Season\s*:\s*(\d+)/i);
+
+if (seasonMatch) {
+  await env.THUMBNAILS.put(
+    `${userId}_${seasonMatch[1]}`,
+    "0"
+  );
+}
+
+await tg(env.BOT_TOKEN, "sendMessage", {
+  chat_id: chatId,
+  text: "✅ Thumbnail saved.\n\nNow send a video."
+});
 
     return;
   }
@@ -113,8 +123,27 @@ async function handleMessage(msg, env) {
     const thumb = JSON.parse(saved);
 
     const cover = thumb.file_id;
-    const imageCaption = thumb.caption || "";
+    let imageCaption = thumb.caption || "";
 
+// Auto Episode Counter
+const seasonMatch = imageCaption.match(/🎞\s*Season\s*:\s*(\d+)/i);
+
+if (seasonMatch) {
+  const season = seasonMatch[1];
+
+  const key = `${userId}_${season}`;
+
+  let episode = await env.THUMBNAILS.get(key);
+
+  episode = episode ? parseInt(episode) + 1 : 1;
+
+  await env.THUMBNAILS.put(key, episode.toString());
+
+  imageCaption = imageCaption.replace(
+    /🎞\s*Season\s*:\s*\d+/i,
+    `🎞 Season : ${season} | Episode : ${episode}`
+  );
+}
     const videoCaption = msg.caption || "";
 
     const finalCaption =
